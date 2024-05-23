@@ -3957,7 +3957,9 @@ export class SongEditor {
                 this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
 
                 if (event.shiftKey && !event.ctrlKey) {
-                    this._doc.selection.boxSelectionX0/1
+                    this._doc.bar = this._doc.bar - this._doc.selection.boxSelectionWidth;
+                    this._doc.selection.boxSelectionX0 - this._doc.selection.boxSelectionWidth
+                    this._doc.selection.boxSelectionX1 - this._doc.selection.boxSelectionWidth
                     this._doc.selection.insertBars();
                 } else if (event.ctrlKey || event.metaKey) {
                     this._doc.selection.insertChannel();
