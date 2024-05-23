@@ -9048,7 +9048,7 @@ var beepbox = (function (exports) {
         }
     }
     EditorConfig.version = "Alpha";
-    EditorConfig.versionDisplayName = "Voxbox " + EditorConfig.version;
+    EditorConfig.versionDisplayName = "VoxBox " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
     EditorConfig.ctrlSymbol = EditorConfig.isOnMac ? "⌘" : "Ctrl+";

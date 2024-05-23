@@ -24,7 +24,7 @@ export function prettyNumber(value: number): string {
 
 export class EditorConfig {
     public static readonly version: string = "Alpha"; // Using patch versions in display right now, maybe TODAY.
-    public static readonly versionDisplayName: string = "Voxbox " + EditorConfig.version;
+    public static readonly versionDisplayName: string = "VoxBox " + EditorConfig.version;
 
     public static readonly releaseNotesURL: string = "./patch_notes.html";
 
