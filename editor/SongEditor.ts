@@ -3958,6 +3958,7 @@ export class SongEditor {
 
                 if (event.shiftKey && !event.ctrlKey) {
                     const minusWidth = this._doc.selection.boxSelectionWidth;
+                    this._doc.bar = this._doc.bar - minusWidth;
                     this._doc.selection.boxSelectionX0 -= minusWidth;
                     this._doc.selection.boxSelectionX1 -= minusWidth;
                     this._doc.selection.insertBars();
