@@ -3958,8 +3958,9 @@ export class SongEditor {
 
                 if (event.shiftKey && !event.ctrlKey) {
                     this._doc.bar = this._doc.bar - this._doc.selection.boxSelectionWidth;
-                    this._doc.selection.boxSelectionX0 - this._doc.selection.boxSelectionWidth
-                    this._doc.selection.boxSelectionX1 - this._doc.selection.boxSelectionWidth
+                    const minusWidth = this._doc.selection.boxSelectionWidth;
+                    this._doc.selection.boxSelectionX0 -= minusWidth;
+                    this._doc.selection.boxSelectionX1 -= minusWidth;
                     this._doc.selection.insertBars();
                 } else if (event.ctrlKey || event.metaKey) {
                     this._doc.selection.insertChannel();
