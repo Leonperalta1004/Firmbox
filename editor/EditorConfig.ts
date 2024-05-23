@@ -23,8 +23,8 @@ export function prettyNumber(value: number): string {
 }
 
 export class EditorConfig {
-    public static readonly version: string = "2.2.7"; // Using patch versions in display right now, maybe TODAY.
-    public static readonly versionDisplayName: string = "UltraBox " + EditorConfig.version;
+    public static readonly version: string = "Alpha"; // Using patch versions in display right now, maybe TODAY.
+    public static readonly versionDisplayName: string = "Voxbox " + EditorConfig.version;
 
     public static readonly releaseNotesURL: string = "./patch_notes.html";
 
@@ -305,7 +305,7 @@ export class EditorConfig {
                 { name: "sonar ping", midiProgram: 121, settings: { "type": "spectrum", "eqFilter": [], "effects": ["note filter", "reverb"], "noteFilter": [{ "type": "low-pass", "cutoffHz": 1681.79, "linearGain": 0.5 }], "reverb": 33, "transition": "normal", "fadeInSeconds": 0.0125, "fadeOutTicks": 72, "chord": "simultaneous", "spectrum": [100, 43, 29, 29, 14, 14, 14, 14, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 2" }] } },
             ])
         },
-        { name: "UltraBox Presets", presets: <DictionaryArray<Preset>>toNameMap([
+        { name: "Voxbox Presets", presets: <DictionaryArray<Preset>>toNameMap([
                 // custom presets from this mod		    
                 { name: "nes white", midiProgram: 116, generalMidi: true, isNoise: true, settings: { "type": "noise", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 8, "eqSimplePeak": 0, "eqSubFilters1": [], "effects": [ "panning" ], "pan": 0, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": 0, "wave": "1-bit white", "envelopes": [] } }, 
                 { name: "nes ping", midiProgram: 116, generalMidi: true, isNoise: true, settings: { "type": "noise", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 8, "eqSimplePeak": 0, "eqSubFilters1": [], "effects": [ "panning" ], "pan": 0, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": 0, "wave": "1-bit metallic", "envelopes": [] } }, 
