@@ -3958,7 +3958,7 @@ export class SongEditor {
 
                 if (event.shiftKey && !event.ctrlKey) {
                     this._doc.bar = this._doc.bar - this._doc.selection.boxSelectionWidth;
-                    this._doc.selection.resetBoxSelection();
+                    //this._doc.selection.resetBoxSelection();
                     this._doc.selection.insertBars();
                 } else if (event.ctrlKey || event.metaKey) {
                     this._doc.selection.insertChannel();
