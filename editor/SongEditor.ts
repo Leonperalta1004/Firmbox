@@ -3957,7 +3957,6 @@ export class SongEditor {
                 this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
 
                 if (event.shiftKey && !event.ctrlKey) {
-                    this._doc.bar = this._doc.bar - this._doc.selection.boxSelectionWidth;
                     const minusWidth = this._doc.selection.boxSelectionWidth;
                     this._doc.selection.boxSelectionX0 -= minusWidth;
                     this._doc.selection.boxSelectionX1 -= minusWidth;
