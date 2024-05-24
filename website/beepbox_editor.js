@@ -815,44 +815,45 @@ var beepbox = (function (exports) {
     Config.envelopes = toNameMap([
         { name: "none", type: 1, speed: 0.0 },
         { name: "note size", type: 0, speed: 0.0 },
-        { name: "punch", type: 2, speed: 0.0 },
-        { name: "flare -1", type: 3, speed: 128.0 },
-        { name: "flare 1", type: 3, speed: 32.0 },
-        { name: "flare 2", type: 3, speed: 8.0 },
-        { name: "flare 3", type: 3, speed: 2.0 },
-        { name: "twang -1", type: 4, speed: 128.0 },
-        { name: "twang 1", type: 4, speed: 32.0 },
-        { name: "twang 2", type: 4, speed: 8.0 },
-        { name: "twang 3", type: 4, speed: 2.0 },
-        { name: "swell -1", type: 5, speed: 128.0 },
-        { name: "swell 1", type: 5, speed: 32.0 },
-        { name: "swell 2", type: 5, speed: 8.0 },
-        { name: "swell 3", type: 5, speed: 2.0 },
-        { name: "tremolo0", type: 6, speed: 8.0 },
-        { name: "tremolo1", type: 6, speed: 4.0 },
-        { name: "tremolo2", type: 6, speed: 2.0 },
-        { name: "tremolo3", type: 6, speed: 1.0 },
-        { name: "tremolo4", type: 7, speed: 4.0 },
-        { name: "tremolo5", type: 7, speed: 2.0 },
-        { name: "tremolo6", type: 7, speed: 1.0 },
-        { name: "decay -1", type: 8, speed: 40.0 },
-        { name: "decay 1", type: 8, speed: 10.0 },
-        { name: "decay 2", type: 8, speed: 7.0 },
-        { name: "decay 3", type: 8, speed: 4.0 },
-        { name: "wibble-1", type: 9, speed: 96.0 },
-        { name: "wibble 1", type: 9, speed: 24.0 },
-        { name: "wibble 2", type: 9, speed: 12.0 },
-        { name: "wibble 3", type: 9, speed: 4.0 },
-        { name: "linear-2", type: 11, speed: 256.0 },
-        { name: "linear-1", type: 11, speed: 128.0 },
-        { name: "linear 1", type: 11, speed: 32.0 },
-        { name: "linear 2", type: 11, speed: 8.0 },
-        { name: "linear 3", type: 11, speed: 2.0 },
-        { name: "rise -2", type: 12, speed: 256.0 },
-        { name: "rise -1", type: 12, speed: 128.0 },
-        { name: "rise 1", type: 12, speed: 32.0 },
-        { name: "rise 2", type: 12, speed: 8.0 },
-        { name: "rise 3", type: 12, speed: 2.0 },
+        { name: "pitch", type: 2, speed: 0.0 },
+        { name: "punch", type: 3, speed: 0.0 },
+        { name: "flare -1", type: 4, speed: 128.0 },
+        { name: "flare 1", type: 4, speed: 32.0 },
+        { name: "flare 2", type: 4, speed: 8.0 },
+        { name: "flare 3", type: 4, speed: 2.0 },
+        { name: "twang -1", type: 5, speed: 128.0 },
+        { name: "twang 1", type: 5, speed: 32.0 },
+        { name: "twang 2", type: 5, speed: 8.0 },
+        { name: "twang 3", type: 5, speed: 2.0 },
+        { name: "swell -1", type: 6, speed: 128.0 },
+        { name: "swell 1", type: 6, speed: 32.0 },
+        { name: "swell 2", type: 6, speed: 8.0 },
+        { name: "swell 3", type: 6, speed: 2.0 },
+        { name: "tremolo0", type: 7, speed: 8.0 },
+        { name: "tremolo1", type: 7, speed: 4.0 },
+        { name: "tremolo2", type: 7, speed: 2.0 },
+        { name: "tremolo3", type: 7, speed: 1.0 },
+        { name: "tremolo4", type: 8, speed: 4.0 },
+        { name: "tremolo5", type: 8, speed: 2.0 },
+        { name: "tremolo6", type: 8, speed: 1.0 },
+        { name: "decay -1", type: 9, speed: 40.0 },
+        { name: "decay 1", type: 9, speed: 10.0 },
+        { name: "decay 2", type: 9, speed: 7.0 },
+        { name: "decay 3", type: 9, speed: 4.0 },
+        { name: "wibble-1", type: 10, speed: 96.0 },
+        { name: "wibble 1", type: 10, speed: 24.0 },
+        { name: "wibble 2", type: 10, speed: 12.0 },
+        { name: "wibble 3", type: 10, speed: 4.0 },
+        { name: "linear-2", type: 12, speed: 256.0 },
+        { name: "linear-1", type: 12, speed: 128.0 },
+        { name: "linear 1", type: 12, speed: 32.0 },
+        { name: "linear 2", type: 12, speed: 8.0 },
+        { name: "linear 3", type: 12, speed: 2.0 },
+        { name: "rise -2", type: 13, speed: 256.0 },
+        { name: "rise -1", type: 13, speed: 128.0 },
+        { name: "rise 1", type: 13, speed: 32.0 },
+        { name: "rise 2", type: 13, speed: 8.0 },
+        { name: "rise 3", type: 13, speed: 2.0 },
         { name: "flute 1", type: 9, speed: 16.0 },
         { name: "flute 2", type: 9, speed: 8.0 },
         { name: "flute 3", type: 9, speed: 4.0 },
@@ -871,9 +872,9 @@ var beepbox = (function (exports) {
         { name: "flutter 1", type: 6, speed: 14.0 },
         { name: "flutter 2", type: 7, speed: 11.0 },
         { name: "water-y flutter", type: 6, speed: 9.0 },
-        { name: "blip 1", type: 13, speed: 6.0 },
-        { name: "blip 2", type: 13, speed: 16.0 },
-        { name: "blip 3", type: 13, speed: 32.0 },
+        { name: "blip 1", type: 14, speed: 6.0 },
+        { name: "blip 2", type: 14, speed: 16.0 },
+        { name: "blip 3", type: 14, speed: 32.0 },
     ]);
     Config.feedbacks = toNameMap([
         { name: "1⟲", indices: [[1], [], [], []] },
@@ -12510,7 +12511,7 @@ li.select2-results__option[role=group] > strong:hover {
             const resonant = (legacyResonanceSetting > 1);
             const firstOrder = (legacyResonanceSetting == 0);
             const cutoffAtMax = (legacyCutoffSetting == legacyFilterCutoffRange - 1);
-            const envDecays = (legacyEnv.type == 3 || legacyEnv.type == 4 || legacyEnv.type == 8 || legacyEnv.type == 0);
+            const envDecays = (legacyEnv.type == 4 || legacyEnv.type == 5 || legacyEnv.type == 9 || legacyEnv.type == 0);
             const standardSampleRate = 48000;
             const legacyHz = legacyFilterCutoffMaxHz * Math.pow(2.0, (legacyCutoffSetting - (legacyFilterCutoffRange - 1)) * 0.5);
             const legacyRadians = Math.min(legacyFilterMaxRadians, 2 * Math.PI * legacyHz / standardSampleRate);
@@ -12961,7 +12962,7 @@ li.select2-results__option[role=group] > strong:hover {
                 legacyFeedbackEnv = Config.envelopes.dictionary["none"];
             const legacyFilterCutoffRange = 11;
             const cutoffAtMax = (legacyCutoffSetting == legacyFilterCutoffRange - 1);
-            if (cutoffAtMax && legacyFilterEnv.type == 2)
+            if (cutoffAtMax && legacyFilterEnv.type == 3)
                 legacyFilterEnv = Config.envelopes.dictionary["none"];
             const carrierCount = Config.algorithms[this.algorithm].carrierCount;
             let noCarriersControlledByNoteSize = true;
@@ -17854,7 +17855,7 @@ li.select2-results__option[role=group] > strong:hover {
             this._prevNoteSizeFinal = Config.noteSizeMax;
             this._modifiedEnvelopeCount = 0;
         }
-        computeEnvelopes(instrument, currentPart, tickTimeStart, tickTimeStartReal, secondsPerTick, tone, timeScale) {
+        computeEnvelopes(instrument, currentPart, tickTimeStart, tickTimeStartReal, secondsPerTick, tone, timeScale, song) {
             secondsPerTick *= timeScale;
             const transition = instrument.getTransition();
             if (tone != null && tone.atNoteStart && !transition.continues && !tone.forceContinueAtStart) {
@@ -17959,24 +17960,24 @@ li.select2-results__option[role=group] > strong:hover {
                 }
                 if (automationTarget.computeIndex != null) {
                     const computeIndex = automationTarget.computeIndex + targetIndex;
-                    let envelopeStart = EnvelopeComputer.computeEnvelope(envelope, noteSecondsStart, beatTimeStart, noteSizeStart);
+                    let envelopeStart = EnvelopeComputer.computeEnvelope(envelope, noteSecondsStart, beatTimeStart, noteSizeStart, tone, song);
                     if (prevSlideStart) {
-                        const other = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsStart, beatTimeStart, prevNoteSize);
+                        const other = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsStart, beatTimeStart, prevNoteSize, tone, song);
                         envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
                     }
                     if (nextSlideStart) {
-                        const other = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeStart, nextNoteSize);
+                        const other = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeStart, nextNoteSize, tone, song);
                         envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
                     }
                     let envelopeEnd = envelopeStart;
                     if (instrument.discreteEnvelope == false) {
-                        envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, noteSecondsEnd, beatTimeEnd, noteSizeEnd);
+                        envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, noteSecondsEnd, beatTimeEnd, noteSizeEnd, tone, song);
                         if (prevSlideEnd) {
-                            const other = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize);
+                            const other = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize, tone, song);
                             envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
                         }
                         if (nextSlideEnd) {
-                            const other = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeEnd, nextNoteSize);
+                            const other = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeEnd, nextNoteSize, tone, song);
                             envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                         }
                     }
@@ -18021,31 +18022,41 @@ li.select2-results__option[role=group] > strong:hover {
             }
             this._modifiedEnvelopeCount = 0;
         }
-        static computeEnvelope(envelope, time, beats, noteSize) {
+        static computeEnvelope(envelope, time, beats, noteSize, tone, song) {
             switch (envelope.type) {
                 case 0: return Synth.noteSizeToVolumeMult(noteSize);
                 case 1: return 1.0;
-                case 4: return 1.0 / (1.0 + time * envelope.speed);
-                case 5: return 1.0 - 1.0 / (1.0 + time * envelope.speed);
-                case 6: return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
-                case 7: return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
-                case 2: return Math.max(1.0, 2.0 - time * 10.0);
-                case 3:
+                case 5: return 1.0 / (1.0 + time * envelope.speed);
+                case 6: return 1.0 - 1.0 / (1.0 + time * envelope.speed);
+                case 7: return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
+                case 8: return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
+                case 3: return Math.max(1.0, 2.0 - time * 10.0);
+                case 4:
                     const attack = 0.25 / Math.sqrt(envelope.speed);
                     return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
-                case 8: return Math.pow(2, -envelope.speed * time);
-                case 13: return 1.0 * +(time < (0.25 / Math.sqrt(envelope.speed)));
-                case 9:
+                case 9: return Math.pow(2, -envelope.speed * time);
+                case 14: return 1.0 * +(time < (0.25 / Math.sqrt(envelope.speed)));
+                case 2:
+                    let basePitch = 0;
+                    let pitch = 0;
+                    if (song) {
+                        basePitch = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
+                    }
+                    if (tone) {
+                        pitch = tone.pitches[0];
+                    }
+                    return (basePitch + pitch) / 96;
+                case 10:
                     let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
                     temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
                     temp = temp > 0.0 ? temp : 0.0;
                     return temp;
-                case 11: {
+                case 12: {
                     let lin = (1.0 - (time / (16 / envelope.speed)));
                     lin = lin > 0.0 ? lin : 0.0;
                     return lin;
                 }
-                case 12: {
+                case 13: {
                     let lin = (time / (16 / envelope.speed));
                     lin = lin < 1.0 ? lin : 1.0;
                     return lin;
@@ -18054,9 +18065,9 @@ li.select2-results__option[role=group] > strong:hover {
             }
         }
         static getLowpassCutoffDecayVolumeCompensation(envelope) {
-            if (envelope.type == 8)
+            if (envelope.type == 9)
                 return 1.25 + 0.025 * envelope.speed;
-            if (envelope.type == 4)
+            if (envelope.type == 5)
                 return 1.0 + 0.02 * envelope.speed;
             return 1.0;
         }
@@ -18430,7 +18441,7 @@ li.select2-results__option[role=group] > strong:hover {
                     useEnvelopeSpeed = (1 - (useEnvelopeSpeed % 1)) * Config.arpSpeedScale[Math.floor(useEnvelopeSpeed)] + (useEnvelopeSpeed % 1) * Config.arpSpeedScale[Math.ceil(useEnvelopeSpeed)];
                 }
             }
-            this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, useEnvelopeSpeed);
+            this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, useEnvelopeSpeed, synth.song);
             const envelopeStarts = this.envelopeComputer.envelopeStarts;
             const envelopeEnds = this.envelopeComputer.envelopeEnds;
             const usesDistortion = effectsIncludeDistortion(this.effects);
@@ -20881,7 +20892,7 @@ li.select2-results__option[role=group] > strong:hover {
                     useEnvelopeSpeed = (1 - (useEnvelopeSpeed % 1)) * Config.arpSpeedScale[Math.floor(useEnvelopeSpeed)] + (useEnvelopeSpeed % 1) * Config.arpSpeedScale[Math.ceil(useEnvelopeSpeed)];
                 }
             }
-            envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, useEnvelopeSpeed);
+            envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, useEnvelopeSpeed, this.song);
             const envelopeStarts = tone.envelopeComputer.envelopeStarts;
             const envelopeEnds = tone.envelopeComputer.envelopeEnds;
             instrument.noteFilter = tmpNoteFilter;
@@ -21056,24 +21067,24 @@ li.select2-results__option[role=group] > strong:hover {
             if (instrument.type == 4) {
                 const drumsetFilterEnvelope = instrument.getDrumsetEnvelope(tone.drumsetPitch);
                 noteFilterExpression *= EnvelopeComputer.getLowpassCutoffDecayVolumeCompensation(drumsetFilterEnvelope);
-                let drumsetFilterEnvelopeStart = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.noteSizeStart);
+                let drumsetFilterEnvelopeStart = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.noteSizeStart, tone, song);
                 if (envelopeComputer.prevSlideStart) {
-                    const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.prevNoteSize);
+                    const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.prevNoteSize, tone, song);
                     drumsetFilterEnvelopeStart += (other - drumsetFilterEnvelopeStart) * envelopeComputer.prevSlideRatioStart;
                 }
                 if (envelopeComputer.nextSlideStart) {
-                    const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeStart, envelopeComputer.nextNoteSize);
+                    const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeStart, envelopeComputer.nextNoteSize, tone, song);
                     drumsetFilterEnvelopeStart += (other - drumsetFilterEnvelopeStart) * envelopeComputer.nextSlideRatioStart;
                 }
                 let drumsetFilterEnvelopeEnd = drumsetFilterEnvelopeStart;
                 if (instrument.discreteEnvelope == false) {
-                    drumsetFilterEnvelopeEnd = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.noteSizeEnd);
+                    drumsetFilterEnvelopeEnd = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.noteSizeEnd, tone, song);
                     if (envelopeComputer.prevSlideEnd) {
-                        const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.prevNoteSize);
+                        const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.prevNoteSize, tone, song);
                         drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * envelopeComputer.prevSlideRatioEnd;
                     }
                     if (envelopeComputer.nextSlideEnd) {
-                        const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeEnd, envelopeComputer.nextNoteSize);
+                        const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeEnd, envelopeComputer.nextNoteSize, tone, song);
                         drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * envelopeComputer.nextSlideRatioEnd;
                     }
                 }
