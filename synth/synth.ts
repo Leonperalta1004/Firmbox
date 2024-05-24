@@ -6966,8 +6966,8 @@ class EnvelopeComputer {
     public nextSlideRatioStart: number = 0.0;
     public nextSlideRatioEnd: number = 0.0;
 
-    public readonly envelopeStarts: number[] = [];
-    public readonly envelopeEnds: number[] = [];
+    public  envelopeStarts: number[] = [];
+    public  envelopeEnds: number[] = [];
     private readonly _modifiedEnvelopeIndices: number[] = [];
     private _modifiedEnvelopeCount: number = 0;
     public lowpassCutoffDecayVolumeCompensation: number = 1.0;
@@ -7628,7 +7628,6 @@ class InstrumentState {
         const usesChorus: boolean = effectsIncludeChorus(this.effects);
         const usesEcho: boolean = effectsIncludeEcho(this.effects);
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
-        this.envelopeComputer.clearEnvelopes();
 
         if (usesDistortion) {
             let useDistortionStart: number = instrument.distortion;
