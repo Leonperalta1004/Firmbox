@@ -2813,6 +2813,8 @@ export class Song {
     private static readonly _latestGoldBoxVersion: number = 4;
     private static readonly _oldestUltraBoxVersion: number = 1;
     private static readonly _latestUltraBoxVersion: number = 5;
+    private static readonly _oldestVoxBoxVersion: number = 1;
+    private static readonly _latestVoxBoxVersion: number = 1;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
 	//also "u" is ultrabox lol
     private static readonly _variant = 0x76; //"v" ~ voxbox
@@ -3028,7 +3030,7 @@ export class Song {
         let buffer: number[] = [];
 
         buffer.push(Song._variant);
-        buffer.push(base64IntToCharCode[Song._latestUltraBoxVersion]);
+        buffer.push(base64IntToCharCode[Song._latestVoxBoxVersion]);
 
         // Length of the song name string
         buffer.push(SongTagCode.songTitle);
@@ -3422,7 +3424,7 @@ export class Song {
                         buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].index]);
                     }
                     buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].envelope]);
-                    buffer.push(base64IntToCharCode[+instrument.envelopeInverse[envelopeIndex]])
+                    buffer.push(base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] ? base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] : base64IntToCharCode[0]);
                 }
             }
         }
@@ -3693,11 +3695,11 @@ export class Song {
         }
 
         const variantTest: number = compressed.charCodeAt(charIndex);
-        let fromBeepBox: boolean;
-        let fromJummBox: boolean;
-        let fromGoldBox: boolean;
-	    let fromUltraBox: boolean;
-        let fromVoxBox: boolean;
+        let fromBeepBox: boolean = false;
+        let fromJummBox: boolean = false;
+        let fromGoldBox: boolean = false;
+	    let fromUltraBox: boolean = false;
+        let fromVoxBox: boolean = false;
         // let fromMidbox: boolean;
         // let fromDogebox2: boolean;
         // let fromAbyssBox: boolean;
@@ -3718,27 +3720,28 @@ export class Song {
             fromVoxBox = false;
             charIndex++;
         } else if (variantTest == 0x75) { //"u"
-                fromBeepBox = false;
-                fromJummBox = false;
-                fromGoldBox = false;
-		        fromUltraBox = true;
-                fromVoxBox = false;
-                charIndex++;
+            fromBeepBox = false;
+            fromJummBox = false;
+            fromGoldBox = false;
+	        fromUltraBox = true;
+            fromVoxBox = false;
+            charIndex++;
         } else if (variantTest == 0x64) { //"d" 
-                fromBeepBox = false;
-                fromJummBox = true;
-                fromGoldBox = false;
-		        fromUltraBox = false;
-                fromVoxBox = false;
-                // to-do: add explicit dogebox2 support
-                //fromDogeBox2 = true;
-                charIndex++;
-        } else if (variantTest == 0x76) {
-                fromBeepBox = false;
-                fromJummBox = false;
-                fromGoldBox = false;
-                fromUltraBox = false;
-                fromVoxBox = true;
+            fromBeepBox = false;
+            fromJummBox = true;
+            fromGoldBox = false;
+	        fromUltraBox = false;
+            fromVoxBox = false;
+            // to-do: add explicit dogebox2 support
+            //fromDogeBox2 = true;
+            charIndex++;
+        } else if (variantTest == 0x76) { // v
+            fromBeepBox = false;
+            fromJummBox = false;
+            fromGoldBox = false;
+            fromUltraBox = false;
+            fromVoxBox = true;
+            charIndex++;
         } else {
             fromBeepBox = true;
             fromJummBox = false;
@@ -3753,7 +3756,7 @@ export class Song {
         if (fromGoldBox && (version == -1 || version > Song._latestGoldBoxVersion || version < Song._oldestGoldBoxVersion)) return;
 	    if (fromUltraBox && (version == -1 || version > Song._latestUltraBoxVersion || version < Song._oldestUltraBoxVersion)) return;
         // Ayo do sumthin abt this
-        if (fromVoxBox && (version == -1 || version > Song._latestUltraBoxVersion || version < Song._oldestUltraBoxVersion)) return;
+        if (fromVoxBox && (version == -1 || version > Song._latestVoxBoxVersion || version < Song._oldestVoxBoxVersion)) return;
         const beforeTwo: boolean = version < 2;
         const beforeThree: boolean = version < 3;
         const beforeFour: boolean = version < 4;
@@ -5214,8 +5217,9 @@ export class Song {
                         if (fromJummBox) aa = jummToUltraEnvelope[aa];
                         const envelope: number = clamp(0, Config.envelopes.length, aa);
                         instrument.addEnvelope(target, index, envelope);
-                        if(fromVoxBox) 
+                        if(fromVoxBox) {
                         instrument.envelopeInverse[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
+                        }
                     }
                 }
             } break;
@@ -6106,7 +6110,7 @@ export class Song {
         const result: any = {
             "name": this.title,
             "format": Song._format,
-            "version": Song._latestUltraBoxVersion,
+            "version": Song._latestVoxBoxVersion,
             "scale": Config.scales[this.scale].name,
             "customScale": this.scaleCustom,
             "key": Config.keys[this.key].name,

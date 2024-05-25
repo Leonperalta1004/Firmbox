@@ -4754,7 +4754,7 @@ var beepbox = (function (exports) {
             let bits;
             let buffer = [];
             buffer.push(Song._variant);
-            buffer.push(base64IntToCharCode[Song._latestUltraBoxVersion]);
+            buffer.push(base64IntToCharCode[Song._latestVoxBoxVersion]);
             buffer.push(78);
             var encodedSongTitle = encodeURIComponent(this.title);
             buffer.push(base64IntToCharCode[encodedSongTitle.length >> 6], base64IntToCharCode[encodedSongTitle.length & 0x3f]);
@@ -5111,7 +5111,7 @@ var beepbox = (function (exports) {
                             buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].index]);
                         }
                         buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].envelope]);
-                        buffer.push(base64IntToCharCode[+instrument.envelopeInverse[envelopeIndex]]);
+                        buffer.push(base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] ? base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] : base64IntToCharCode[0]);
                     }
                 }
             }
@@ -5349,11 +5349,11 @@ var beepbox = (function (exports) {
                 return;
             }
             const variantTest = compressed.charCodeAt(charIndex);
-            let fromBeepBox;
-            let fromJummBox;
-            let fromGoldBox;
-            let fromUltraBox;
-            let fromVoxBox;
+            let fromBeepBox = false;
+            let fromJummBox = false;
+            let fromGoldBox = false;
+            let fromUltraBox = false;
+            let fromVoxBox = false;
             if (variantTest == 0x6A) {
                 fromBeepBox = false;
                 fromJummBox = true;
@@ -5392,6 +5392,7 @@ var beepbox = (function (exports) {
                 fromGoldBox = false;
                 fromUltraBox = false;
                 fromVoxBox = true;
+                charIndex++;
             }
             else {
                 fromBeepBox = true;
@@ -5409,7 +5410,7 @@ var beepbox = (function (exports) {
                 return;
             if (fromUltraBox && (version == -1 || version > Song._latestUltraBoxVersion || version < Song._oldestUltraBoxVersion))
                 return;
-            if (fromVoxBox && (version == -1 || version > Song._latestUltraBoxVersion || version < Song._oldestUltraBoxVersion))
+            if (fromVoxBox && (version == -1 || version > Song._latestVoxBoxVersion || version < Song._oldestVoxBoxVersion))
                 return;
             const beforeTwo = version < 2;
             const beforeThree = version < 3;
@@ -6821,8 +6822,9 @@ var beepbox = (function (exports) {
                                         aa = jummToUltraEnvelope[aa];
                                     const envelope = clamp(0, Config.envelopes.length, aa);
                                     instrument.addEnvelope(target, index, envelope);
-                                    if (fromVoxBox)
+                                    if (fromVoxBox) {
                                         instrument.envelopeInverse[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
+                                    }
                                 }
                             }
                         }
@@ -7663,7 +7665,7 @@ var beepbox = (function (exports) {
             const result = {
                 "name": this.title,
                 "format": Song._format,
-                "version": Song._latestUltraBoxVersion,
+                "version": Song._latestVoxBoxVersion,
                 "scale": Config.scales[this.scale].name,
                 "customScale": this.scaleCustom,
                 "key": Config.keys[this.key].name,
@@ -8248,6 +8250,8 @@ var beepbox = (function (exports) {
     Song._latestGoldBoxVersion = 4;
     Song._oldestUltraBoxVersion = 1;
     Song._latestUltraBoxVersion = 5;
+    Song._oldestVoxBoxVersion = 1;
+    Song._latestVoxBoxVersion = 1;
     Song._variant = 0x76;
     class PickedString {
         constructor() {
