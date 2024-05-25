@@ -1030,7 +1030,7 @@ export class SongEditor {
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
     private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics") }, "Harmonics:"), this._harmonicsEditor.container);
     
-    private readonly _envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc);
+    private readonly _envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc, (id: number, submenu: number) => this._toggleDropdownMenu(id, submenu), (name: string) => this._openPrompt(name));
     private readonly _discreteEnvelopeBox: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
     private readonly _discreteEnvelopeRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), this._discreteEnvelopeBox);
     private readonly _envelopeSpeedDisplay: HTMLSpanElement = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
@@ -1784,6 +1784,11 @@ export class SongEditor {
                 target = this._unisonDropdown;
                 this._openUnisonDropdown = this._openUnisonDropdown ? false : true;
                 group = this._unisonDropdownGroup;
+                break;
+            case DropdownID.EnvelopeSettings:
+                target = this._envelopeEditor._extraSettingsDropdowns[submenu]
+                this._envelopeEditor._openExtraSettingsDropdowns[submenu] = this._envelopeEditor._openExtraSettingsDropdowns[submenu] ? false : true;
+                group = this._envelopeEditor._dropdownGroups[submenu];
                 break;
         }
 

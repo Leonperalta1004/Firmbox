@@ -3,23 +3,29 @@
 import {InstrumentType, Config} from "../synth/SynthConfig";
 import {Instrument} from "../synth/synth";
 import {SongDocument} from "./SongDocument";
-import {ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope} from "./changes";
+import {ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope, ChangeEnvelopeInverse} from "./changes";
 import {HTML} from "imperative-html/dist/esm/elements-strict";
+import {DropdownID} from "../synth/SynthConfig";
 
 export class EnvelopeEditor {
 	public readonly container: HTMLElement = HTML.div({class: "envelopeEditor"});
+	
 	
 	private readonly _rows: HTMLDivElement[] = [];
 	private readonly _targetSelects: HTMLSelectElement[] = [];
 	private readonly _envelopeSelects: HTMLSelectElement[] = [];
 	private readonly _deleteButtons: HTMLButtonElement[] = [];
+	public readonly _extraSettingsDropdowns: HTMLButtonElement[] = [];
+	public readonly _inverters: HTMLInputElement[] = [];
+	public readonly _dropdownGroups: HTMLDivElement[] = [];
+	public readonly _openExtraSettingsDropdowns: Boolean[] = [];
 	private _renderedEnvelopeCount: number = 0;
 	private _renderedEqFilterCount: number = -1;
 	private _renderedNoteFilterCount: number = -1;
 	private _renderedInstrumentType: InstrumentType;
 	private _renderedEffects: number = 0;
 	
-	constructor(private _doc: SongDocument) {
+	constructor(private _doc: SongDocument, private _extraSettingsDropdown: Function, private _openPrompt: Function) {
 		this.container.addEventListener("change", this._onChange);
 		this.container.addEventListener("click", this._onClick);
 	}
@@ -27,6 +33,7 @@ export class EnvelopeEditor {
 	private _onChange = (event: Event): void => {
 		const targetSelectIndex: number = this._targetSelects.indexOf(<any> event.target);
 		const envelopeSelectIndex: number = this._envelopeSelects.indexOf(<any> event.target);
+		const inverseIndex = this._inverters.indexOf(<any>event.target);
 		if (targetSelectIndex != -1) {
 			const combinedValue: number = parseInt(this._targetSelects[targetSelectIndex].value);
 			const target: number = combinedValue % Config.instrumentAutomationTargets.length;
@@ -34,7 +41,10 @@ export class EnvelopeEditor {
 			this._doc.record(new ChangeSetEnvelopeTarget(this._doc, targetSelectIndex, target, index));
 		} else if (envelopeSelectIndex != -1) {
 			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeSelectIndex, this._envelopeSelects[envelopeSelectIndex].selectedIndex));
+		} else if ((inverseIndex != 1)) {
+			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverseIndex].checked, inverseIndex));
 		}
+
 	}
 	
 	private _onClick = (event: MouseEvent): void => {
@@ -86,17 +96,33 @@ export class EnvelopeEditor {
 			for (let envelope: number = 0; envelope < Config.envelopes.length; envelope++) {
 				envelopeSelect.appendChild(HTML.option({value: envelope}, Config.envelopes[envelope].name));
 			} 
+
+
+
+			const invertBox: HTMLInputElement = HTML.input({ "checked": instrument.envelopeInverse[envelopeIndex], type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" });
+			const invertWrapper: HTMLDivElement = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("invert") }, "Invert: "), invertBox);
+			const extraSettingsDropdown: HTMLButtonElement = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._extraSettingsDropdown(DropdownID.EnvelopeSettings, envelopeIndex, Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name) }, "▼");
+            extraSettingsDropdown.style.display = "inline";
+			const extraSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, invertWrapper);
+            extraSettingsDropdownGroup.style.display = "none";
 			
+
+
 			const deleteButton: HTMLButtonElement = HTML.button({type: "button", class: "delete-envelope"});
 			
 			const row: HTMLDivElement = HTML.div({class: "envelope-row"},
+			extraSettingsDropdown,
 				HTML.div({class: "selectContainer", style: "width: 0; flex: 1;"}, targetSelect),
 				HTML.div({class: "selectContainer", style: "width: 0; flex: 0.7;"}, envelopeSelect),
 				deleteButton,
 			);
 			
 			this.container.appendChild(row);
+			this.container.appendChild(extraSettingsDropdownGroup);
 			this._rows[envelopeIndex] = row;
+			this._inverters[envelopeIndex] = invertBox;
+			this._dropdownGroups[envelopeIndex] = extraSettingsDropdownGroup;
+			this._extraSettingsDropdowns[envelopeIndex] = extraSettingsDropdown;
 			this._targetSelects[envelopeIndex] = targetSelect;
 			this._envelopeSelects[envelopeIndex] = envelopeSelect;
 			this._deleteButtons[envelopeIndex] = deleteButton;
