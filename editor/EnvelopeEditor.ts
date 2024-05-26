@@ -75,7 +75,15 @@ export class EnvelopeEditor {
 			option.hidden = !instrument.supportsEnvelopeTarget(target, index);
 		}
 	}
-	
+
+	public rerenderExtraSettings() {
+		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+		for (let i = 0; i < instrument.envelopeCount; i++) {
+			this._extraSettingsDropdowns[i].style.display = instrument.envelopes[i].envelope ? "inline" : "none";
+
+		}
+	}
+
 	public render(): void {
 		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
 		

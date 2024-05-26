@@ -2781,6 +2781,7 @@ export class SongEditor {
                 this._envelopeDropdownGroup.style.display = "none";
 
             this._envelopeEditor.render();
+            this._envelopeEditor.rerenderExtraSettings();
 
             for (let chordIndex: number = 0; chordIndex < Config.chords.length; chordIndex++) {
                 let hidden: boolean = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);
@@ -4325,6 +4326,7 @@ export class SongEditor {
                 } else {
                     this._doc.selection.setChannelBar((this._doc.channel - 1 + this._doc.song.getChannelCount()) % this._doc.song.getChannelCount(), this._doc.bar);
                     this._doc.selection.resetBoxSelection();
+                    this._envelopeEditor.rerenderExtraSettings();
                 }
                 event.preventDefault();
                 break;
@@ -4338,6 +4340,7 @@ export class SongEditor {
                 } else {
                     this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
                     this._doc.selection.resetBoxSelection();
+                    this._envelopeEditor.rerenderExtraSettings();
                 }
                 event.preventDefault();
                 break;

@@ -33362,6 +33362,12 @@ You should be redirected to the song at:<br /><br />
                 option.hidden = !instrument.supportsEnvelopeTarget(target, index);
             }
         }
+        rerenderExtraSettings() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            for (let i = 0; i < instrument.envelopeCount; i++) {
+                this._extraSettingsDropdowns[i].style.display = instrument.envelopes[i].envelope ? "inline" : "none";
+            }
+        }
         render() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             for (let envelopeIndex = this._rows.length; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
@@ -42474,6 +42480,7 @@ You should be redirected to the song at:<br /><br />
                     else
                         this._envelopeDropdownGroup.style.display = "none";
                     this._envelopeEditor.render();
+                    this._envelopeEditor.rerenderExtraSettings();
                     for (let chordIndex = 0; chordIndex < Config.chords.length; chordIndex++) {
                         let hidden = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);
                         const option = this._chordSelect.children[chordIndex];
@@ -43675,6 +43682,7 @@ You should be redirected to the song at:<br /><br />
                         else {
                             this._doc.selection.setChannelBar((this._doc.channel - 1 + this._doc.song.getChannelCount()) % this._doc.song.getChannelCount(), this._doc.bar);
                             this._doc.selection.resetBoxSelection();
+                            this._envelopeEditor.rerenderExtraSettings();
                         }
                         event.preventDefault();
                         break;
@@ -43690,6 +43698,7 @@ You should be redirected to the song at:<br /><br />
                         else {
                             this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
                             this._doc.selection.resetBoxSelection();
+                            this._envelopeEditor.rerenderExtraSettings();
                         }
                         event.preventDefault();
                         break;
