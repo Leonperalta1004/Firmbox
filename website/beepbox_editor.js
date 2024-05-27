@@ -33364,8 +33364,27 @@ You should be redirected to the song at:<br /><br />
         }
         rerenderExtraSettings() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-            for (let i = 0; i < instrument.envelopeCount; i++) {
-                this._extraSettingsDropdowns[i].style.display = instrument.envelopes[i].envelope ? "inline" : "none";
+            for (let i = 0; i < Config.maxEnvelopeCount; i++) {
+                if (i >= instrument.envelopeCount) {
+                    if (this._extraSettingsDropdowns[i]) {
+                        this._extraSettingsDropdowns[i].style.display = "none";
+                    }
+                    if (this._dropdownGroups[i]) {
+                        this._dropdownGroups[i].style.display = "none";
+                    }
+                }
+                else if (this._extraSettingsDropdowns[i].textContent == "▲") {
+                    this._dropdownGroups[i].style.display = "flex";
+                    this._extraSettingsDropdowns[i].style.display = "inline";
+                }
+                else if (this._extraSettingsDropdowns[i].textContent == "▼") {
+                    this._dropdownGroups[i].style.display = "none";
+                    this._extraSettingsDropdowns[i].style.display = "inline";
+                }
+                else {
+                    this._extraSettingsDropdowns[i].style.display = "none";
+                    this._dropdownGroups[i].style.display = "none";
+                }
             }
         }
         render() {
