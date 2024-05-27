@@ -33407,7 +33407,7 @@ You should be redirected to the song at:<br /><br />
                     envelopeSelect.appendChild(HTML.option({ value: envelope }, Config.envelopes[envelope].name));
                 }
                 const invertBox = HTML.input({ "checked": instrument.envelopeInverse[envelopeIndex], type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" });
-                const invertWrapper = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("invert") }, "Invert: "), invertBox);
+                const invertWrapper = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeInvert") }, "Invert: "), invertBox);
                 const extraSettingsDropdown = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._extraSettingsDropdown(8, envelopeIndex, Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name) }, "▼");
                 extraSettingsDropdown.style.display = "inline";
                 const extraSettingsDropdownGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, invertWrapper);
@@ -39151,6 +39151,11 @@ You should be redirected to the song at:<br /><br />
                 case "unisonSign":
                     {
                         message = div$5(h2$4("Unison Sign"), p("This setting is a volume multiplier applied to the second voice. This setting will only work correctly with two voices."));
+                    }
+                    break;
+                case "envelopeInvert":
+                    {
+                        message = div$5(h2$4("Envelope Invert"), p("This setting toggles the direction in which the envelope takes effect"));
                     }
                     break;
                 default:

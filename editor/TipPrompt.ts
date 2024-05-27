@@ -546,6 +546,13 @@ export class TipPrompt implements Prompt {
 					p("This setting is a volume multiplier applied to the second voice. This setting will only work correctly with two voices."),
 				);
 			} break;
+			case "envelopeInvert": {
+				message = div(
+					h2("Envelope Invert"),
+					p("This setting toggles the direction in which the envelope takes effect"),
+				);
+
+			} break;
 
 			default:
 				// Check for modSetinfo#
