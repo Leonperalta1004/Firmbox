@@ -854,24 +854,24 @@ var beepbox = (function (exports) {
         { name: "rise 1", type: 13, speed: 32.0 },
         { name: "rise 2", type: 13, speed: 8.0 },
         { name: "rise 3", type: 13, speed: 2.0 },
-        { name: "flute 1", type: 9, speed: 16.0 },
-        { name: "flute 2", type: 9, speed: 8.0 },
-        { name: "flute 3", type: 9, speed: 4.0 },
-        { name: "tripolo1", type: 6, speed: 9.0 },
-        { name: "tripolo2", type: 6, speed: 6.0 },
-        { name: "tripolo3", type: 6, speed: 3.0 },
-        { name: "tripolo4", type: 7, speed: 9.0 },
-        { name: "tripolo5", type: 7, speed: 6.0 },
-        { name: "tripolo6", type: 7, speed: 3.0 },
-        { name: "pentolo1", type: 6, speed: 10.0 },
-        { name: "pentolo2", type: 6, speed: 5.0 },
-        { name: "pentolo3", type: 6, speed: 2.5 },
-        { name: "pentolo4", type: 7, speed: 10.0 },
-        { name: "pentolo5", type: 7, speed: 5.0 },
-        { name: "pentolo6", type: 7, speed: 2.5 },
-        { name: "flutter 1", type: 6, speed: 14.0 },
-        { name: "flutter 2", type: 7, speed: 11.0 },
-        { name: "water-y flutter", type: 6, speed: 9.0 },
+        { name: "flute 1", type: 10, speed: 16.0 },
+        { name: "flute 2", type: 10, speed: 8.0 },
+        { name: "flute 3", type: 10, speed: 4.0 },
+        { name: "tripolo1", type: 7, speed: 9.0 },
+        { name: "tripolo2", type: 7, speed: 6.0 },
+        { name: "tripolo3", type: 7, speed: 3.0 },
+        { name: "tripolo4", type: 8, speed: 9.0 },
+        { name: "tripolo5", type: 8, speed: 6.0 },
+        { name: "tripolo6", type: 8, speed: 3.0 },
+        { name: "pentolo1", type: 7, speed: 10.0 },
+        { name: "pentolo2", type: 7, speed: 5.0 },
+        { name: "pentolo3", type: 7, speed: 2.5 },
+        { name: "pentolo4", type: 8, speed: 10.0 },
+        { name: "pentolo5", type: 8, speed: 5.0 },
+        { name: "pentolo6", type: 8, speed: 2.5 },
+        { name: "flutter 1", type: 7, speed: 14.0 },
+        { name: "flutter 2", type: 8, speed: 11.0 },
+        { name: "water-y flutter", type: 7, speed: 9.0 },
         { name: "blip 1", type: 14, speed: 6.0 },
         { name: "blip 2", type: 14, speed: 16.0 },
         { name: "blip 3", type: 14, speed: 32.0 },
@@ -28016,6 +28016,9 @@ li.select2-results__option[role=group] > strong:hover {
                 instrument.envelopes[i].target = instrument.envelopes[i + 1].target;
                 instrument.envelopes[i].index = instrument.envelopes[i + 1].index;
                 instrument.envelopes[i].envelope = instrument.envelopes[i + 1].envelope;
+                if (i < instrument.envelopeCount - 1) {
+                    instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
+                }
             }
             instrument.preset = instrument.type;
             doc.notifier.changed();
@@ -33408,8 +33411,7 @@ You should be redirected to the song at:<br /><br />
                 }
                 const invertBox = HTML.input({ "checked": instrument.envelopeInverse[envelopeIndex], type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" });
                 const invertWrapper = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeInvert") }, "Invert: "), invertBox);
-                const extraSettingsDropdown = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._extraSettingsDropdown(8, envelopeIndex, Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name) }, "▼");
-                extraSettingsDropdown.style.display = "inline";
+                const extraSettingsDropdown = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => { const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()]; this._extraSettingsDropdown(8, envelopeIndex, Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name); } }, "▼");
                 const extraSettingsDropdownGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, invertWrapper);
                 extraSettingsDropdownGroup.style.display = "none";
                 const deleteButton = HTML.button({ type: "button", class: "delete-envelope" });

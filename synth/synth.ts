@@ -7270,8 +7270,6 @@ class EnvelopeComputer {
                 return (basePitch + pitch) / 96
             }
 
-            
-
 
             case EnvelopeType.wibble:
                 let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
