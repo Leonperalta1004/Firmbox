@@ -7275,16 +7275,29 @@ class EnvelopeComputer {
                 let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
                 temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
                 temp = temp > 0.0 ? temp : 0.0;
-                return temp;
+                if (instrument.envelopeInverse[index]) {
+                    return 1 - temp;
+                } else {
+                    return temp;
+                }
+                
             case EnvelopeType.linear: {
                 let lin = (1.0 - (time / (16 / envelope.speed)));
                 lin = lin > 0.0 ? lin : 0.0;
-                return lin;
+                if (instrument.envelopeInverse[index]) {
+                    return 1 - lin;
+                } else {
+                    return lin;
+                }
             }
             case EnvelopeType.rise: {
                 let lin = (time / (16 / envelope.speed));
                 lin = lin < 1.0 ? lin : 1.0;
-                return lin;
+                if (instrument.envelopeInverse[index]) {
+                    return 1 - lin;
+                } else {
+                    return lin;
+                }
             }
             default: throw new Error("Unrecognized operator envelope type.");
         }
