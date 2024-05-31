@@ -1795,13 +1795,14 @@ export class SongEditor {
         if (target.textContent == "▼") {
             let instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             target.textContent = "▲";
+            this._envelopeEditor.rerenderExtraSettings(); // Goober
             if (group != this._chordDropdownGroup) {
                 group.style.display = "";
             } // Only show arpeggio dropdown if chord arpeggiates
             else if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                 group.style.display = "";
             }
-
+            
             for (let i: number = 0; i < group.children.length; i++) {
                 // A timeout is needed so that the previous 0s, 0 opacity settings can be applied. They're not done until the group is visible again because display: none prunes animation steps.
                 setTimeout(() => {

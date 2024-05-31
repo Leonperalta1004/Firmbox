@@ -44731,6 +44731,7 @@ You should be redirected to the song at:<br /><br />
             if (target.textContent == "▼") {
                 let instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                 target.textContent = "▲";
+                this._envelopeEditor.rerenderExtraSettings();
                 if (group != this._chordDropdownGroup) {
                     group.style.display = "";
                 }
