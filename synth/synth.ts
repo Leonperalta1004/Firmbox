@@ -5215,6 +5215,7 @@ export class Song {
                         let aa:number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         if ((beforeTwo && fromGoldBox) || (fromBeepBox)) aa = pregoldToEnvelope[aa]; 
                         if (fromJummBox) aa = jummToUltraEnvelope[aa];
+                        if (fromVoxBox && aa >= 2) aa++;
                         const envelope: number = clamp(0, Config.envelopes.length, aa);
                         instrument.addEnvelope(target, index, envelope);
                         if(fromVoxBox) {

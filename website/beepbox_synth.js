@@ -6820,6 +6820,8 @@ var beepbox = (function (exports) {
                                         aa = pregoldToEnvelope[aa];
                                     if (fromJummBox)
                                         aa = jummToUltraEnvelope[aa];
+                                    if (fromVoxBox && aa >= 2)
+                                        aa++;
                                     const envelope = clamp(0, Config.envelopes.length, aa);
                                     instrument.addEnvelope(target, index, envelope);
                                     if (fromVoxBox) {

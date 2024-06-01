@@ -16238,6 +16238,8 @@ li.select2-results__option[role=group] > strong:hover {
                                         aa = pregoldToEnvelope[aa];
                                     if (fromJummBox)
                                         aa = jummToUltraEnvelope[aa];
+                                    if (fromVoxBox && aa >= 2)
+                                        aa++;
                                     const envelope = clamp(0, Config.envelopes.length, aa);
                                     instrument.addEnvelope(target, index, envelope);
                                     if (fromVoxBox) {
@@ -33394,6 +33396,7 @@ You should be redirected to the song at:<br /><br />
                 else if (this._extraSettingsDropdowns[i].textContent == "▲") {
                     this._dropdownGroups[i].style.display = "flex";
                     this._extraSettingsDropdowns[i].style.display = "inline";
+                    this._inverters[i].checked = instrument.envelopeInverse[i];
                 }
                 else if (this._extraSettingsDropdowns[i].textContent == "▼") {
                     this._dropdownGroups[i].style.display = "none";
@@ -33462,6 +33465,7 @@ You should be redirected to the song at:<br /><br />
             for (let envelopeIndex = 0; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
                 this._targetSelects[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].target + instrument.envelopes[envelopeIndex].index * Config.instrumentAutomationTargets.length);
                 this._envelopeSelects[envelopeIndex].selectedIndex = instrument.envelopes[envelopeIndex].envelope;
+                this._inverters[envelopeIndex].checked = instrument.envelopeInverse[envelopeIndex];
             }
             this._renderedEnvelopeCount = instrument.envelopeCount;
             this._renderedEqFilterCount = instrument.eqFilter.controlPointCount;
@@ -44726,12 +44730,12 @@ You should be redirected to the song at:<br /><br />
                     target = this._envelopeEditor._extraSettingsDropdowns[submenu];
                     this._envelopeEditor._openExtraSettingsDropdowns[submenu] = this._envelopeEditor._openExtraSettingsDropdowns[submenu] ? false : true;
                     group = this._envelopeEditor._dropdownGroups[submenu];
+                    this._envelopeEditor.rerenderExtraSettings();
                     break;
             }
             if (target.textContent == "▼") {
                 let instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                 target.textContent = "▲";
-                this._envelopeEditor.rerenderExtraSettings();
                 if (group != this._chordDropdownGroup) {
                     group.style.display = "";
                 }

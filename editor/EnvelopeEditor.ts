@@ -89,6 +89,7 @@ public rerenderExtraSettings() {
             } else if (this._extraSettingsDropdowns[i].textContent == "▲") {
                 this._dropdownGroups[i].style.display = "flex";
                 this._extraSettingsDropdowns[i].style.display = "inline";
+				this._inverters[i].checked = instrument.envelopeInverse[i];
             } else if (this._extraSettingsDropdowns[i].textContent == "▼") {
                 this._dropdownGroups[i].style.display = "none";
                 this._extraSettingsDropdowns[i].style.display = "inline";
@@ -178,6 +179,7 @@ public rerenderExtraSettings() {
 		for (let envelopeIndex: number = 0; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
 			this._targetSelects[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].target + instrument.envelopes[envelopeIndex].index * Config.instrumentAutomationTargets.length);
 			this._envelopeSelects[envelopeIndex].selectedIndex = instrument.envelopes[envelopeIndex].envelope;
+			this._inverters[envelopeIndex].checked = instrument.envelopeInverse[envelopeIndex];
 		}
 		
 		this._renderedEnvelopeCount = instrument.envelopeCount;

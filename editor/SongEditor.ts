@@ -1789,13 +1789,13 @@ export class SongEditor {
                 target = this._envelopeEditor._extraSettingsDropdowns[submenu]
                 this._envelopeEditor._openExtraSettingsDropdowns[submenu] = this._envelopeEditor._openExtraSettingsDropdowns[submenu] ? false : true;
                 group = this._envelopeEditor._dropdownGroups[submenu];
+                this._envelopeEditor.rerenderExtraSettings(); // Goober
                 break;
         }
 
         if (target.textContent == "▼") {
             let instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             target.textContent = "▲";
-            this._envelopeEditor.rerenderExtraSettings(); // Goober
             if (group != this._chordDropdownGroup) {
                 group.style.display = "";
             } // Only show arpeggio dropdown if chord arpeggiates
