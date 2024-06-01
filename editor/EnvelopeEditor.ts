@@ -41,7 +41,7 @@ export class EnvelopeEditor {
 			this._doc.record(new ChangeSetEnvelopeTarget(this._doc, targetSelectIndex, target, index));
 		} else if (envelopeSelectIndex != -1) {
 			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeSelectIndex, this._envelopeSelects[envelopeSelectIndex].selectedIndex));
-		} else if ((inverseIndex != 1)) {
+		} else if ((inverseIndex != -1)) {
 			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverseIndex].checked, inverseIndex));
 		}
 
