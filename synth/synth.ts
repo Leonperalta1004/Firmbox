@@ -2718,7 +2718,7 @@ export class Instrument {
         return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
     }
 
-    public addEnvelope(target: number, index: number, envelope: number): void {
+    public addEnvelope(target: number, index: number, envelope: number, inverse: boolean = false): void {
         let makeEmpty: boolean = false;
         if (!this.supportsEnvelopeTarget(target, index)) makeEmpty = true;
         if (this.envelopeCount >= Config.maxEnvelopeCount) throw new Error();
@@ -2728,6 +2728,7 @@ export class Instrument {
         envelopeSettings.index = makeEmpty ? 0 : index;
         envelopeSettings.envelope = envelope;
         this.envelopeCount++;
+        this.envelopeInverse[this.envelopeCount - 1] = inverse;
     }
 
     public supportsEnvelopeTarget(target: number, index: number): boolean {

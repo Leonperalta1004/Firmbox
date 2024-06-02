@@ -13934,7 +13934,7 @@ li.select2-results__option[role=group] > strong:hover {
         static frequencyFromPitch(pitch) {
             return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
         }
-        addEnvelope(target, index, envelope) {
+        addEnvelope(target, index, envelope, inverse = false) {
             let makeEmpty = false;
             if (!this.supportsEnvelopeTarget(target, index))
                 makeEmpty = true;
@@ -13947,6 +13947,7 @@ li.select2-results__option[role=group] > strong:hover {
             envelopeSettings.index = makeEmpty ? 0 : index;
             envelopeSettings.envelope = envelope;
             this.envelopeCount++;
+            this.envelopeInverse[this.envelopeCount - 1] = inverse;
         }
         supportsEnvelopeTarget(target, index) {
             const automationTarget = Config.instrumentAutomationTargets[target];
@@ -28033,9 +28034,7 @@ li.select2-results__option[role=group] > strong:hover {
                 instrument.envelopes[i].target = instrument.envelopes[i + 1].target;
                 instrument.envelopes[i].index = instrument.envelopes[i + 1].index;
                 instrument.envelopes[i].envelope = instrument.envelopes[i + 1].envelope;
-                if (i < instrument.envelopeCount - 1) {
-                    instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
-                }
+                instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
             }
             instrument.preset = instrument.type;
             doc.notifier.changed();

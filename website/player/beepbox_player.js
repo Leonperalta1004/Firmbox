@@ -12069,7 +12069,7 @@ var beepbox = (function (exports) {
         static frequencyFromPitch(pitch) {
             return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
         }
-        addEnvelope(target, index, envelope) {
+        addEnvelope(target, index, envelope, inverse = false) {
             let makeEmpty = false;
             if (!this.supportsEnvelopeTarget(target, index))
                 makeEmpty = true;
@@ -12082,6 +12082,7 @@ var beepbox = (function (exports) {
             envelopeSettings.index = makeEmpty ? 0 : index;
             envelopeSettings.envelope = envelope;
             this.envelopeCount++;
+            this.envelopeInverse[this.envelopeCount - 1] = inverse;
         }
         supportsEnvelopeTarget(target, index) {
             const automationTarget = Config.instrumentAutomationTargets[target];

@@ -4858,9 +4858,7 @@ export class ChangeRemoveEnvelope extends Change {
             instrument.envelopes[i].target = instrument.envelopes[i + 1].target;
             instrument.envelopes[i].index = instrument.envelopes[i + 1].index;
             instrument.envelopes[i].envelope = instrument.envelopes[i + 1].envelope;
-            if (i < instrument.envelopeCount - 1) {
             instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
-            }
         }
         
         // TODO: Shift any envelopes that were targeting other envelope indices after the removed one.
