@@ -3714,11 +3714,27 @@ var beepbox = (function (exports) {
             }
             if (this.type == 2) {
                 instrumentObject["wave"] = Config.chipNoises[this.chipNoise].name;
+                instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+                if (this.unison == Config.unisons.length) {
+                    instrumentObject["unisonVoices"] = this.unisonVoices;
+                    instrumentObject["unisonSpread"] = this.unisonSpread;
+                    instrumentObject["unisonOffset"] = this.unisonOffset;
+                    instrumentObject["unisonExpression"] = this.unisonExpression;
+                    instrumentObject["unisonSign"] = this.unisonSign;
+                }
             }
             else if (this.type == 3) {
                 instrumentObject["spectrum"] = [];
                 for (let i = 0; i < Config.spectrumControlPoints; i++) {
                     instrumentObject["spectrum"][i] = Math.round(100 * this.spectrumWave.spectrum[i] / Config.spectrumMax);
+                    instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+                    if (this.unison == Config.unisons.length) {
+                        instrumentObject["unisonVoices"] = this.unisonVoices;
+                        instrumentObject["unisonSpread"] = this.unisonSpread;
+                        instrumentObject["unisonOffset"] = this.unisonOffset;
+                        instrumentObject["unisonExpression"] = this.unisonExpression;
+                        instrumentObject["unisonSign"] = this.unisonSign;
+                    }
                 }
             }
             else if (this.type == 4) {
@@ -3753,6 +3769,14 @@ var beepbox = (function (exports) {
             }
             else if (this.type == 6) {
                 instrumentObject["pulseWidth"] = this.pulseWidth;
+                instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+                if (this.unison == Config.unisons.length) {
+                    instrumentObject["unisonVoices"] = this.unisonVoices;
+                    instrumentObject["unisonSpread"] = this.unisonSpread;
+                    instrumentObject["unisonOffset"] = this.unisonOffset;
+                    instrumentObject["unisonExpression"] = this.unisonExpression;
+                    instrumentObject["unisonSign"] = this.unisonSign;
+                }
                 instrumentObject["decimalOffset"] = this.decimalOffset;
             }
             else if (this.type == 8) {
