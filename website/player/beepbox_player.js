@@ -11281,13 +11281,13 @@ var beepbox = (function (exports) {
                 for (let i = 0; i < Config.spectrumControlPoints; i++) {
                     instrumentObject["spectrum"][i] = Math.round(100 * this.spectrumWave.spectrum[i] / Config.spectrumMax);
                     instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
-                    if (this.unison == Config.unisons.length) {
-                        instrumentObject["unisonVoices"] = this.unisonVoices;
-                        instrumentObject["unisonSpread"] = this.unisonSpread;
-                        instrumentObject["unisonOffset"] = this.unisonOffset;
-                        instrumentObject["unisonExpression"] = this.unisonExpression;
-                        instrumentObject["unisonSign"] = this.unisonSign;
-                    }
+                }
+                if (this.unison == Config.unisons.length) {
+                    instrumentObject["unisonVoices"] = this.unisonVoices;
+                    instrumentObject["unisonSpread"] = this.unisonSpread;
+                    instrumentObject["unisonOffset"] = this.unisonOffset;
+                    instrumentObject["unisonExpression"] = this.unisonExpression;
+                    instrumentObject["unisonSign"] = this.unisonSign;
                 }
             }
             else if (this.type == 4) {
@@ -11747,6 +11747,9 @@ var beepbox = (function (exports) {
                             for (let i = 0; i < Config.spectrumControlPoints; i++) {
                                 this.drumsetSpectrumWaves[j].spectrum[i] = Math.max(0, Math.min(Config.spectrumMax, Math.round(Config.spectrumMax * (+drum["spectrum"][i]) / 100)));
                             }
+                            for (let i = 0; i < Config.drumCount; i++) {
+                                this.drumsetSpectrumWaves[i].markCustomWaveDirty();
+                            }
                         }
                     }
                 }
@@ -12093,7 +12096,7 @@ var beepbox = (function (exports) {
         static frequencyFromPitch(pitch) {
             return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
         }
-        addEnvelope(target, index, envelope, inverse = false) {
+        addEnvelope(target, index, envelope) {
             let makeEmpty = false;
             if (!this.supportsEnvelopeTarget(target, index))
                 makeEmpty = true;
@@ -12106,7 +12109,6 @@ var beepbox = (function (exports) {
             envelopeSettings.index = makeEmpty ? 0 : index;
             envelopeSettings.envelope = envelope;
             this.envelopeCount++;
-            this.envelopeInverse[this.envelopeCount - 1] = inverse;
         }
         supportsEnvelopeTarget(target, index) {
             const automationTarget = Config.instrumentAutomationTargets[target];
@@ -14398,7 +14400,7 @@ var beepbox = (function (exports) {
                                         aa = pregoldToEnvelope[aa];
                                     if (fromJummBox)
                                         aa = jummToUltraEnvelope[aa];
-                                    if (fromVoxBox && aa >= 2)
+                                    if (!fromVoxBox && aa >= 2)
                                         aa++;
                                     const envelope = clamp(0, Config.envelopes.length, aa);
                                     instrument.addEnvelope(target, index, envelope);
@@ -16283,20 +16285,16 @@ var beepbox = (function (exports) {
                         return 1.0 * +(time < (0.25 / Math.sqrt(envelope.speed)));
                     }
                 case 2:
-                    let basePitch = 0;
                     let pitch = 0;
                     let inverse = instrument.envelopeInverse[index];
-                    if (song) {
-                        basePitch = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
-                    }
                     if (tone) {
                         pitch = tone.pitches[0];
                     }
                     if (inverse) {
-                        return 1 - (basePitch + pitch) / 96;
+                        return 1 - (pitch) / 96;
                     }
                     else {
-                        return (basePitch + pitch) / 96;
+                        return (pitch) / 96;
                     }
                 case 10:
                     let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;

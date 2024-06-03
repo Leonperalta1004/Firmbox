@@ -1903,6 +1903,7 @@ export class Instrument {
             for (let i: number = 0; i < Config.spectrumControlPoints; i++) {
                 instrumentObject["spectrum"][i] = Math.round(100 * this.spectrumWave.spectrum[i] / Config.spectrumMax);
                 instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+            }
             if (this.unison == Config.unisons.length) {
 
                 instrumentObject["unisonVoices"] = this.unisonVoices;
@@ -1915,7 +1916,6 @@ export class Instrument {
 
                 instrumentObject["unisonSign"] = this.unisonSign;
 
-            }
 
             }
         } else if (this.type == InstrumentType.drumset) {
@@ -2401,6 +2401,9 @@ export class Instrument {
                         for (let i: number = 0; i < Config.spectrumControlPoints; i++) {
                             this.drumsetSpectrumWaves[j].spectrum[i] = Math.max(0, Math.min(Config.spectrumMax, Math.round(Config.spectrumMax * (+drum["spectrum"][i]) / 100)));
                         }
+                        for (let i: number = 0; i < Config.drumCount; i++) {
+                            this.drumsetSpectrumWaves[i].markCustomWaveDirty();
+                        }
                     }
                 }
             }
@@ -2762,7 +2765,7 @@ export class Instrument {
         return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
     }
 
-    public addEnvelope(target: number, index: number, envelope: number, inverse: boolean = false): void {
+    public addEnvelope(target: number, index: number, envelope: number/*, inverse: boolean = false*/): void {
         let makeEmpty: boolean = false;
         if (!this.supportsEnvelopeTarget(target, index)) makeEmpty = true;
         if (this.envelopeCount >= Config.maxEnvelopeCount) throw new Error();
@@ -2772,7 +2775,7 @@ export class Instrument {
         envelopeSettings.index = makeEmpty ? 0 : index;
         envelopeSettings.envelope = envelope;
         this.envelopeCount++;
-        this.envelopeInverse[this.envelopeCount - 1] = inverse;
+        /* this.envelopeInverse[this.envelopeCount - 1] = inverse; */
     }
 
     public supportsEnvelopeTarget(target: number, index: number): boolean {
@@ -3800,7 +3803,6 @@ export class Song {
         if (fromJummBox && (version == -1 || version > Song._latestJummBoxVersion || version < Song._oldestJummBoxVersion)) return;
         if (fromGoldBox && (version == -1 || version > Song._latestGoldBoxVersion || version < Song._oldestGoldBoxVersion)) return;
 	    if (fromUltraBox && (version == -1 || version > Song._latestUltraBoxVersion || version < Song._oldestUltraBoxVersion)) return;
-        // Ayo do sumthin abt this
         if (fromVoxBox && (version == -1 || version > Song._latestVoxBoxVersion || version < Song._oldestVoxBoxVersion)) return;
         const beforeTwo: boolean = version < 2;
         const beforeThree: boolean = version < 3;
@@ -5260,7 +5262,7 @@ export class Song {
                         let aa:number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         if ((beforeTwo && fromGoldBox) || (fromBeepBox)) aa = pregoldToEnvelope[aa]; 
                         if (fromJummBox) aa = jummToUltraEnvelope[aa];
-                        if (fromVoxBox && aa >= 2) aa++;
+                        if (!fromVoxBox && aa >= 2) aa++;
                         const envelope: number = clamp(0, Config.envelopes.length, aa);
                         instrument.addEnvelope(target, index, envelope);
                         if(fromVoxBox) {
@@ -5304,7 +5306,7 @@ export class Song {
             case SongTagCode.spectrum: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if (instrument.type == InstrumentType.spectrum) {
-                    const byteCount: number = Math.ceil(Config.spectrumControlPoints * Config.spectrumControlPointBits / 6)
+                    const byteCount: number = Math.ceil(Config.spectrumControlPoints * Config.spectrumControlPointBits / 6);
                     const bits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
                     for (let i: number = 0; i < Config.spectrumControlPoints; i++) {
                         instrument.spectrumWave.spectrum[i] = bits.read(Config.spectrumControlPointBits);
@@ -7300,22 +7302,22 @@ class EnvelopeComputer {
                 return 1.0 * + (time < (0.25 / Math.sqrt(envelope.speed)));
             }
 
-            case EnvelopeType.pitch: 
-            let basePitch: number = 0;
+             case EnvelopeType.pitch: 
+            /*let basePitch: number = 0;*/
             let pitch: number = 0;
             let inverse: boolean = instrument.envelopeInverse[index];
-            if (song) {
+            /*if (song) {
                 basePitch = Config.keys[song!.key].basePitch + (Config.pitchesPerOctave * song!.octave);
-            }
+            }*/
             if (tone) {
                 pitch = tone.pitches[0];
             }
             if (inverse) {
-                return 1 - (basePitch + pitch) / 96;
+                return 1 - (/*basePitch + */pitch) / 96;
             } else {
-                return (basePitch + pitch) / 96
+                return (/*basePitch + */pitch) / 96
             }
-
+            
 
             case EnvelopeType.wibble:
                 let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
