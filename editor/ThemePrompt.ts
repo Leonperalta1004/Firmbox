@@ -35,7 +35,7 @@ export class ThemePrompt implements Prompt {
 			option({ value: "energized" }, "Energized"),
 			option({ value: "neapolitan" }, "Neapolitan"),
 			option({ value: "poly" }, "Poly"),
-			option({ value: "blutonium" }, "Blutonium"),
+			option({ value: "voxonium" }, "Voxonium"),
 			// colorblind-friendly themes, by nep and choptop. in most circumstances I wouldn't add ultrabox-unique themes because of the custom theme sheet, but
 			// the azur lane theme is here because nep wanted it...
 			option({ value: "azur lane" }, "Azur Lane"),
