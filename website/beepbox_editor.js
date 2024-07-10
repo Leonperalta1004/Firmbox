@@ -5301,7 +5301,7 @@ var beepbox = (function (exports) {
 			--disabled-note-primary: #c6c6c6;
 			--disabled-note-secondary: #8c8c8c;
 		}`,
-        "blutonium": `:root {
+        "voxonium": `:root {
 			--page-margin: #02070D;
 			--editor-background: #02070D;
 			--hover-preview: white;
@@ -5336,9 +5336,9 @@ var beepbox = (function (exports) {
 			--mute-button-normal: #273b9d;
 			--mute-button-mod: #27989d;
 			--pitch1-secondary-channel: hsl(200, 100%, 40%);
-			--pitch1-primary-channel: #99ddff;
+			--pitch1-primary-channel: ##6ecfff;
 			--pitch1-secondary-note: hsl(200, 100%, 40%);
-			--pitch1-primary-note: #99ddff;
+			--pitch1-primary-note: ##6ecfff;
 			--pitch2-secondary-channel: 	hsl(212, 100%, 34%);
 			--pitch2-primary-channel: #5BA8FF;
 			--pitch2-secondary-note: hsl(212, 100%, 34%);
