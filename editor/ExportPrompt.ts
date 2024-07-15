@@ -534,7 +534,7 @@ export class ExportPrompt implements Prompt {
                 writeEventTime(0);
                 writer.writeUint8(MidiEventType.meta);
                 writer.writeMidi7Bits(MidiMetaEventMessage.text);
-                writer.writeMidiAscii("Composed with jummbus.bitbucket.io");
+                writer.writeMidiAscii("Composed with Voxbox");
 
                 writeEventTime(0);
                 writer.writeUint8(MidiEventType.meta);
@@ -557,7 +557,7 @@ export class ExportPrompt implements Prompt {
                 if ((key & 1) == 1) numSharps += 6; // For odd key values (consider circle of fifths) rotate around the circle... kinda... Look conventional key signatures are just weird, okay?
                 if (isMinor) numSharps += 9; // A minor A scale has zero sharps, shift it appropriately
                 while (numSharps > 6) numSharps -= 12; // Range is (modulo 12) - 5. Midi supports -7 to +7, but I only have 12 options.
-
+                
                 writeEventTime(0);
                 writer.writeUint8(MidiEventType.meta);
                 writer.writeMidi7Bits(MidiMetaEventMessage.keySignature);

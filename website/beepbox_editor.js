@@ -31132,7 +31132,7 @@ li.select2-results__option[role=group] > strong:hover {
                     writeEventTime(0);
                     writer.writeUint8(255);
                     writer.writeMidi7Bits(1);
-                    writer.writeMidiAscii("Composed with jummbus.bitbucket.io");
+                    writer.writeMidiAscii("Composed with Voxbox");
                     writeEventTime(0);
                     writer.writeUint8(255);
                     writer.writeMidi7Bits(81);
