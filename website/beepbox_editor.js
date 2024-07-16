@@ -31067,9 +31067,12 @@ li.select2-results__option[role=group] > strong:hover {
             const microsecondsPerMinute = secondsPerMinute * 1000000;
             const beatsPerMinute = song.getBeatsPerMinute();
             const microsecondsPerBeat = Math.round(microsecondsPerMinute / beatsPerMinute);
-            const midiTicksPerBar = midiTicksPerBeat * song.beatsPerBar;
             const pitchBendRange = 24;
             const defaultNoteVelocity = 90;
+            const findBarLength = (bar) => {
+                let partsInBar = this._doc.synth.findPartsInBar(bar);
+                return partsInBar * midiTicksPerPart;
+            };
             const unrolledBars = [];
             if (this._enableIntro.checked) {
                 for (let bar = 0; bar < song.loopStart; bar++) {
@@ -31085,6 +31088,10 @@ li.select2-results__option[role=group] > strong:hover {
                 for (let bar = song.loopStart + song.loopLength; bar < song.barCount; bar++) {
                     unrolledBars.push(bar);
                 }
+            }
+            const barLengths = [];
+            for (let bar = 0; bar < song.barCount; bar++) {
+                barLengths.push(findBarLength(bar));
             }
             const tracks = [{ isMeta: true, channel: -1, midiChannel: -1, isNoise: false, isDrumset: false }];
             let midiChannelCounter = 0;
@@ -31128,6 +31135,20 @@ li.select2-results__option[role=group] > strong:hover {
                     writer.writeMidi7Bits(message);
                     writer.writeMidi7Bits(value | 0);
                 };
+                let prevBeatsPerBar = song.beatsPerBar;
+                const writeTimeSignature = (beatsPerBar) => {
+                    if (beatsPerBar === prevBeatsPerBar)
+                        return;
+                    writeEventTime(barStartTime);
+                    writer.writeUint8(255);
+                    writer.writeMidi7Bits(88);
+                    writer.writeMidiVariableLength(4);
+                    writer.writeUint8(beatsPerBar);
+                    writer.writeUint8(2);
+                    writer.writeUint8(24);
+                    writer.writeUint8(8);
+                    prevBeatsPerBar = beatsPerBar;
+                };
                 if (isMeta) {
                     writeEventTime(0);
                     writer.writeUint8(255);
@@ -31162,23 +31183,50 @@ li.select2-results__option[role=group] > strong:hover {
                     writer.writeMidiVariableLength(2);
                     writer.writeInt8(numSharps);
                     writer.writeUint8(isMinor ? 1 : 0);
-                    if (this._enableIntro.checked)
-                        barStartTime += midiTicksPerBar * song.loopStart;
+                    if (this._enableIntro.checked) {
+                        for (let bar = 0; bar < song.loopStart; bar++) {
+                            let midiTicksPerBar = barLengths[bar];
+                            const beatsPerBar = midiTicksPerBar / midiTicksPerPart / Config.partsPerBeat;
+                            const beatsPerBarInt = Math.floor(beatsPerBar);
+                            writeTimeSignature(beatsPerBarInt);
+                            barStartTime += midiTicksPerBar;
+                        }
+                    }
                     writeEventTime(barStartTime);
                     writer.writeUint8(255);
                     writer.writeMidi7Bits(6);
                     writer.writeMidiAscii("Loop Start");
                     for (let loopIndex = 0; loopIndex < parseInt(this._loopDropDown.value); loopIndex++) {
-                        barStartTime += midiTicksPerBar * song.loopLength;
+                        for (let bar = song.loopStart; bar < song.loopStart + song.loopLength; bar++) {
+                            let midiTicksPerBar = barLengths[bar];
+                            const beatsPerBar = midiTicksPerBar / midiTicksPerPart / Config.partsPerBeat;
+                            const beatsPerBarInt = Math.floor(beatsPerBar);
+                            writeTimeSignature(beatsPerBarInt);
+                            barStartTime += midiTicksPerBar;
+                        }
                         writeEventTime(barStartTime);
                         writer.writeUint8(255);
                         writer.writeMidi7Bits(6);
                         writer.writeMidiAscii(loopIndex < Number(this._loopDropDown.value) - 1 ? "Loop Repeat" : "Loop End");
                     }
-                    if (this._enableOutro.checked)
-                        barStartTime += midiTicksPerBar * (song.barCount - song.loopStart - song.loopLength);
-                    if (barStartTime != midiTicksPerBar * unrolledBars.length)
-                        throw new Error("Miscalculated number of bars.");
+                    if (this._enableOutro.checked) {
+                        for (let bar = song.loopStart + song.loopLength; bar < song.barCount; bar++) {
+                            let midiTicksPerBar = barLengths[bar];
+                            const beatsPerBar = midiTicksPerBar / midiTicksPerPart / Config.partsPerBeat;
+                            const beatsPerBarInt = Math.floor(beatsPerBar);
+                            writeTimeSignature(beatsPerBarInt);
+                            barStartTime += midiTicksPerBar;
+                        }
+                    }
+                    {
+                        let total = 0;
+                        for (const bar of unrolledBars) {
+                            let midiTicksPerBar = barLengths[bar];
+                            total += midiTicksPerBar;
+                        }
+                        if (barStartTime != total)
+                            throw new Error("Miscalculated number of bars.");
+                    }
                 }
                 else {
                     let channelName = isNoise
@@ -31267,6 +31315,8 @@ li.select2-results__option[role=group] > strong:hover {
                     const intervalScale = isNoise ? Config.noiseInterval : 1;
                     for (const bar of unrolledBars) {
                         const pattern = song.getPattern(channel, bar);
+                        let midiTicksPerBar = barLengths[bar];
+                        const barEndTime = barStartTime + midiTicksPerBar;
                         if (pattern != null) {
                             const instrumentIndex = pattern.instruments[0];
                             const instrument = song.channels[channel].instruments[instrumentIndex];
@@ -31288,7 +31338,14 @@ li.select2-results__option[role=group] > strong:hover {
                             }
                             for (let noteIndex = 0; noteIndex < pattern.notes.length; noteIndex++) {
                                 const note = pattern.notes[noteIndex];
-                                const noteStartTime = barStartTime + note.start * midiTicksPerPart;
+                                let noteStartTime = barStartTime + note.start * midiTicksPerPart;
+                                if (noteStartTime > barEndTime)
+                                    noteStartTime = barEndTime;
+                                let noteEndTime = barStartTime + note.end * midiTicksPerPart;
+                                if (noteEndTime > barEndTime)
+                                    noteEndTime = barEndTime;
+                                if (noteStartTime >= noteEndTime)
+                                    continue;
                                 let pinTime = noteStartTime;
                                 let pinSize = note.pins[0].size;
                                 let pinInterval = note.pins[0].interval;
@@ -31314,7 +31371,11 @@ li.select2-results__option[role=group] > strong:hover {
                                     const nextPinInterval = note.pins[pinIndex].interval;
                                     const length = nextPinTime - pinTime;
                                     for (let midiTick = 0; midiTick < length; midiTick++) {
-                                        const midiTickTime = pinTime + midiTick;
+                                        let midiTickTime = pinTime + midiTick;
+                                        if (midiTickTime > barEndTime) {
+                                            midiTickTime = barEndTime;
+                                            pinIndex = note.pins.length;
+                                        }
                                         const linearSize = lerp(pinSize, nextPinSize, midiTick / length);
                                         const linearInterval = lerp(pinInterval, nextPinInterval, midiTick / length);
                                         const interval = linearInterval * intervalScale - pitchOffset;
@@ -31395,7 +31456,6 @@ li.select2-results__option[role=group] > strong:hover {
                                     pinSize = nextPinSize;
                                     pinInterval = nextPinInterval;
                                 }
-                                const noteEndTime = barStartTime + note.end * midiTicksPerPart;
                                 for (let toneIndex = 0; toneIndex < toneCount; toneIndex++) {
                                     writeEventTime(noteEndTime);
                                     writer.writeUint8(128 | midiChannel);
