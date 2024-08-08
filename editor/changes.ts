@@ -4859,6 +4859,8 @@ export class ChangeRemoveEnvelope extends Change {
             instrument.envelopes[i].index = instrument.envelopes[i + 1].index;
             instrument.envelopes[i].envelope = instrument.envelopes[i + 1].envelope;
             instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
+            instrument.envelopes[i].pitchEnvelopeStart = instrument.envelopes[i + 1].pitchEnvelopeStart;
+            instrument.envelopes[i].pitchEnvelopeEnd = instrument.envelopes[i + 1].pitchEnvelopeEnd;
         }
         
         // TODO: Shift any envelopes that were targeting other envelope indices after the removed one.
@@ -4891,6 +4893,34 @@ export class ChangeSetEnvelopeType extends Change {
         const oldValue: number = instrument.envelopes[envelopeIndex].envelope;
         if (oldValue != newValue) {
             instrument.envelopes[envelopeIndex].envelope = newValue;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeEnvelopePitchStart extends Change {
+    constructor(doc: SongDocument, startNote: number, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldStartNote: number = instrument.envelopes[index].pitchEnvelopeStart;
+        if (oldStartNote != startNote) {
+            instrument.envelopes[index].pitchEnvelopeStart = startNote;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeEnvelopePitchEnd extends Change {
+    constructor(doc: SongDocument, endNote: number, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldEndNote: number = instrument.envelopes[index].pitchEnvelopeEnd;
+        if (oldEndNote != endNote) {
+            instrument.envelopes[index].pitchEnvelopeEnd = endNote;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();

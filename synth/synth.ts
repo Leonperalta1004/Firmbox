@@ -1295,6 +1295,9 @@ export class EnvelopeSettings {
     public target: number = 0;
     public index: number = 0;
     public envelope: number = 0;
+    public pitchEnvelopeStart: number = 0;
+    public pitchEnvelopeEnd: number = 96;
+    
 
     constructor() {
         this.reset();
@@ -1304,12 +1307,16 @@ export class EnvelopeSettings {
         this.target = 0;
         this.index = 0;
         this.envelope = 0;
+        this.pitchEnvelopeStart = 0;
+        this.pitchEnvelopeEnd = 96;
     }
 
     public toJsonObject(): Object {
         const envelopeObject: any = {
             "target": Config.instrumentAutomationTargets[this.target].name,
             "envelope": Config.envelopes[this.envelope].name,
+            "pitchEnvelopeStart": this.pitchEnvelopeStart,
+            "pitchEnvelopeEnd": this.pitchEnvelopeEnd,
         };
         if (Config.instrumentAutomationTargets[this.target].maxCount > 1) {
             envelopeObject["index"] = this.index;
@@ -1333,6 +1340,20 @@ export class EnvelopeSettings {
         } else {
             this.index = 0;
         }
+
+        if (envelopeObject["pitchEnvelopeStart"] != undefined) {
+            this.pitchEnvelopeStart = envelopeObject["pitchEnvelopeStart"]
+        } else {
+            this.index = 96;
+        }
+
+        if (envelopeObject["pitchEnvelopeEnd"] != undefined) {
+            this.pitchEnvelopeStart = envelopeObject["pitchEnvelopeEnd"]
+        } else {
+            this.index = 0;
+        }
+
+
     }
 }
 
@@ -2712,7 +2733,7 @@ export class Instrument {
                     if (this.envelopeCount >= Config.maxEnvelopeCount) break;
                     const tempEnvelope: EnvelopeSettings = new EnvelopeSettings();
                     tempEnvelope.fromJsonObject(envelopeArray[i]);
-                    this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope);
+                    this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, tempEnvelope.pitchEnvelopeStart, tempEnvelope.pitchEnvelopeEnd);
                     if (instrumentObject["pitchEnvelopeInverse" + i] != undefined){
                         this.envelopeInverse[i] = instrumentObject["pitchEnvelopeInverse" + i];
                     } else {
@@ -2765,7 +2786,7 @@ export class Instrument {
         return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
     }
 
-    public addEnvelope(target: number, index: number, envelope: number/*, inverse: boolean = false*/): void {
+    public addEnvelope(target: number, index: number, envelope: number, pitchEnvelopeStart: number = 0, pitchEnvelopeEnd: number = 96 /*, inverse: boolean = false*/): void {
         let makeEmpty: boolean = false;
         if (!this.supportsEnvelopeTarget(target, index)) makeEmpty = true;
         if (this.envelopeCount >= Config.maxEnvelopeCount) throw new Error();
@@ -2774,6 +2795,8 @@ export class Instrument {
         envelopeSettings.target = makeEmpty ? Config.instrumentAutomationTargets.dictionary["none"].index : target;
         envelopeSettings.index = makeEmpty ? 0 : index;
         envelopeSettings.envelope = envelope;
+        envelopeSettings.pitchEnvelopeStart = pitchEnvelopeStart;
+        envelopeSettings.pitchEnvelopeEnd = pitchEnvelopeEnd;
         this.envelopeCount++;
         /* this.envelopeInverse[this.envelopeCount - 1] = inverse; */
     }
@@ -2862,7 +2885,7 @@ export class Song {
     private static readonly _oldestUltraBoxVersion: number = 1;
     private static readonly _latestUltraBoxVersion: number = 5;
     private static readonly _oldestVoxBoxVersion: number = 1;
-    private static readonly _latestVoxBoxVersion: number = 1;
+    private static readonly _latestVoxBoxVersion: number = 2;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
 	//also "u" is ultrabox lol
     private static readonly _variant = 0x76; //"v" ~ voxbox
@@ -3472,7 +3495,15 @@ export class Song {
                         buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].index]);
                     }
                     buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].envelope]);
+
+                    if (Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name == "pitch") {
+                        buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeStart >> 6], base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeStart & 0x3f]);
+                        buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeEnd >> 6], base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeEnd & 0x3f]);
+                    }
+
+
                     buffer.push(base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] ? base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] : base64IntToCharCode[0]);
+
                 }
             }
         }
@@ -5264,7 +5295,18 @@ export class Song {
                         if (fromJummBox) aa = jummToUltraEnvelope[aa];
                         if (!fromVoxBox && aa >= 2) aa++;
                         const envelope: number = clamp(0, Config.envelopes.length, aa);
-                        instrument.addEnvelope(target, index, envelope);
+                        let pitchEnvelopeStart: number = 0;
+                        let pitchEnvelopeEnd: number = 96
+                        if (fromVoxBox && !beforeTwo) {
+                            if(Config.envelopes[envelope].name == "pitch") {
+                                let pitchEnvelopeCompact: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                pitchEnvelopeStart = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                pitchEnvelopeEnd = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]; 
+                            }
+                        }
+                        instrument.addEnvelope(target, index, envelope, pitchEnvelopeStart, pitchEnvelopeEnd);
+
                         if(fromVoxBox) {
                         instrument.envelopeInverse[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
                         }
@@ -7071,7 +7113,7 @@ class EnvelopeComputer {
         this._modifiedEnvelopeCount = 0;
     }
 
-    public computeEnvelopes(instrument: Instrument, currentPart: number, tickTimeStart: number, tickTimeStartReal: number, secondsPerTick: number, tone: Tone | null, timeScale: number, song: Song | null): void {
+    public computeEnvelopes(instrument: Instrument, currentPart: number, tickTimeStart: number, tickTimeStartReal: number, secondsPerTick: number, tone: Tone | null, timeScale: number, song: Song | null, instrumentState: InstrumentState): void {
         secondsPerTick *= timeScale;
         const transition: Transition = instrument.getTransition();
         if (tone != null && tone.atNoteStart && !transition.continues && !tone.forceContinueAtStart) {
@@ -7177,24 +7219,24 @@ class EnvelopeComputer {
             }
             if (/*automationTarget.perNote == this._perNote &&*/ automationTarget.computeIndex != null) {
                 const computeIndex: number = automationTarget.computeIndex + targetIndex;
-                let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, noteSecondsStart, beatTimeStart, noteSizeStart, tone, song, instrument, envelopeIndex);
+                let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, noteSecondsStart, beatTimeStart, noteSizeStart, tone, song, instrument, envelopeIndex, instrumentState);
                 if (prevSlideStart) {
-                    const other: number = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsStart, beatTimeStart, prevNoteSize, tone, song, instrument, envelopeIndex);
+                    const other: number = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsStart, beatTimeStart, prevNoteSize, tone, song, instrument, envelopeIndex, instrumentState);
                     envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
                 }
                 if (nextSlideStart) {
-                    const other: number = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeStart, nextNoteSize, tone, song, instrument, envelopeIndex);
+                    const other: number = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeStart, nextNoteSize, tone, song, instrument, envelopeIndex, instrumentState);
                     envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
                 }
                 let envelopeEnd: number = envelopeStart;
                 if (instrument.discreteEnvelope == false) {
-                    envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, noteSecondsEnd, beatTimeEnd, noteSizeEnd, tone, song, instrument, envelopeIndex);
+                    envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, noteSecondsEnd, beatTimeEnd, noteSizeEnd, tone, song, instrument, envelopeIndex, instrumentState);
                     if (prevSlideEnd) {
-                        const other: number = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize, tone, song, instrument, envelopeIndex);
+                        const other: number = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize, tone, song, instrument, envelopeIndex, instrumentState);
                         envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
                     }
                     if (nextSlideEnd) {
-                        const other: number = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeEnd, nextNoteSize, tone, song, instrument, envelopeIndex);
+                        const other: number = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeEnd, nextNoteSize, tone, song, instrument, envelopeIndex, instrumentState);
                         envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                     }
                 }
@@ -7244,7 +7286,7 @@ class EnvelopeComputer {
         this._modifiedEnvelopeCount = 0;
     }
 
-    public static computeEnvelope(envelope: Envelope, time: number, beats: number, noteSize: number, tone: Tone | null, song: Song | null, instrument: Instrument, index: number): number {
+    public static computeEnvelope(envelope: Envelope, time: number, beats: number, noteSize: number, tone: Tone | null, song: Song | null, instrument: Instrument, index: number, instrumentState: InstrumentState): number {
         switch (envelope.type) {
             case EnvelopeType.none: return 1.0;
             case EnvelopeType.noteSize:
@@ -7306,18 +7348,45 @@ class EnvelopeComputer {
             /*let basePitch: number = 0;*/
             let pitch: number = 0;
             let inverse: boolean = instrument.envelopeInverse[index];
+            let startNote: number = 0;
+            let endNote: number = 96;
+
+            startNote = instrument.envelopes[index].pitchEnvelopeStart;
+            endNote = instrument.envelopes[index].pitchEnvelopeEnd;
+
             /*if (song) {
                 basePitch = Config.keys[song!.key].basePitch + (Config.pitchesPerOctave * song!.octave);
             }*/
             if (tone) {
-                pitch = tone.pitches[0];
+                const chord = instrument.getChord()
+                const arpeggiates = chord.arpeggiates;
+                const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio); //calculate arpeggiation
+                const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : 0]
+                pitch = tone.lastInterval != tonePitch ? tonePitch + tone.lastInterval : tonePitch; //account for pitch bends
             }
+            if (startNote > endNote) { //Reset if values are improper
+                startNote = 0;
+                endNote = 96
+            }
+            const range = endNote - startNote + 1;
+
             if (inverse) {
-                return 1 - (/*basePitch + */pitch) / 96;
+                if (pitch <= startNote) {
+                    return 1
+                }
+                if (pitch >= startNote) {
+                    return 0
+                }
+                return 1 - (pitch - startNote)/range
             } else {
-                return (/*basePitch + */pitch) / 96
+                if (pitch <= startNote) {
+                    return 0
+                }
+                if (pitch >= startNote) {
+                    return 1
+                }
+                return (pitch - startNote)/range
             }
-            
 
             case EnvelopeType.wibble:
                 let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
@@ -7772,7 +7841,7 @@ class InstrumentState {
                 useEnvelopeSpeed = (1 - (useEnvelopeSpeed % 1)) * Config.arpSpeedScale[Math.floor(useEnvelopeSpeed)] + (useEnvelopeSpeed % 1) * Config.arpSpeedScale[Math.ceil(useEnvelopeSpeed)];
             }
         }
-        this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, useEnvelopeSpeed, synth.song);
+        this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, useEnvelopeSpeed, synth.song, this);
         const envelopeStarts: number[] = this.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = this.envelopeComputer.envelopeEnds;
 
@@ -10642,7 +10711,7 @@ export class Synth {
                 useEnvelopeSpeed = (1 - (useEnvelopeSpeed % 1)) * Config.arpSpeedScale[Math.floor(useEnvelopeSpeed)] + (useEnvelopeSpeed % 1) * Config.arpSpeedScale[Math.ceil(useEnvelopeSpeed)];
             }
         }
-        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, useEnvelopeSpeed, this.song);
+        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, useEnvelopeSpeed, this.song, instrumentState);
         const envelopeStarts: number[] = tone.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = tone.envelopeComputer.envelopeEnds;
         instrument.noteFilter = tmpNoteFilter;
@@ -10844,29 +10913,29 @@ export class Synth {
             noteFilterExpression *= EnvelopeComputer.getLowpassCutoffDecayVolumeCompensation(drumsetFilterEnvelope)
 
             // Drumset filters use the same envelope timing as the rest of the envelopes, but do not include support for slide transitions.
-            let drumsetFilterEnvelopeStart: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.noteSizeStart, tone, song, instrument, -2);
+            let drumsetFilterEnvelopeStart: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.noteSizeStart, tone, song, instrument, -2, instrumentState);
 
             // Apply slide interpolation to drumset envelope.
             if (envelopeComputer.prevSlideStart) {
-                const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.prevNoteSize, tone, song, instrument, -2);
+                const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.prevNoteSize, tone, song, instrument, -2, instrumentState);
                 drumsetFilterEnvelopeStart += (other - drumsetFilterEnvelopeStart) * envelopeComputer.prevSlideRatioStart;
             }
             if (envelopeComputer.nextSlideStart) {
-                const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeStart, envelopeComputer.nextNoteSize, tone, song, instrument, -2);
+                const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeStart, envelopeComputer.nextNoteSize, tone, song, instrument, -2, instrumentState);
                 drumsetFilterEnvelopeStart += (other - drumsetFilterEnvelopeStart) * envelopeComputer.nextSlideRatioStart;
             }
             
             let drumsetFilterEnvelopeEnd: number = drumsetFilterEnvelopeStart;
 
             if ( instrument.discreteEnvelope == false ) {
-                drumsetFilterEnvelopeEnd = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.noteSizeEnd, tone, song, instrument, -2);
+                drumsetFilterEnvelopeEnd = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.noteSizeEnd, tone, song, instrument, -2, instrumentState);
 
                 if (envelopeComputer.prevSlideEnd) {
-                    const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.prevNoteSize, tone, song, instrument, -2);
+                    const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.prevNoteSize, tone, song, instrument, -2, instrumentState);
                     drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * envelopeComputer.prevSlideRatioEnd;
                 }
                 if (envelopeComputer.nextSlideEnd) {
-                    const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeEnd, envelopeComputer.nextNoteSize, tone, song, instrument, -2);
+                    const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeEnd, envelopeComputer.nextNoteSize, tone, song, instrument, -2, instrumentState);
                     drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * envelopeComputer.nextSlideRatioEnd;
                 }
             }

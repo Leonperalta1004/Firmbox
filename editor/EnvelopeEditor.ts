@@ -3,7 +3,7 @@
 import {InstrumentType, Config} from "../synth/SynthConfig";
 import {Instrument} from "../synth/synth";
 import {SongDocument} from "./SongDocument";
-import {ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope, ChangeEnvelopeInverse} from "./changes";
+import {ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope, ChangeEnvelopeInverse, ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd} from "./changes";
 import {HTML} from "imperative-html/dist/esm/elements-strict";
 import {DropdownID} from "../synth/SynthConfig";
 
@@ -18,6 +18,16 @@ export class EnvelopeEditor {
 	public readonly _extraSettingsDropdowns: HTMLButtonElement[] = [];
 	public readonly _inverters: HTMLInputElement[] = [];
 	public readonly _dropdownGroups: HTMLDivElement[] = [];
+
+	private readonly _pitchStartSliders: HTMLInputElement[] = [];
+	private readonly _pitchEndSliders: HTMLInputElement[] = [];
+	private readonly _startNoteDisplays: HTMLSpanElement[] = [];
+	private readonly _endNoteDisplays: HTMLSpanElement[] = [];
+
+	public readonly extraPitchSettingsGroups: HTMLDivElement[] = [];
+	public readonly pitchStartBoxes: HTMLInputElement[] = [];
+	public readonly pitchEndBoxes: HTMLInputElement[] = [];
+
 	public readonly _openExtraSettingsDropdowns: Boolean[] = [];
 	private _renderedEnvelopeCount: number = 0;
 	private _renderedEqFilterCount: number = -1;
@@ -25,9 +35,26 @@ export class EnvelopeEditor {
 	private _renderedInstrumentType: InstrumentType;
 	private _renderedEffects: number = 0;
 	
+	private _onInput = (event: Event): void => {
+        const startBoxIndex: number = this.pitchStartBoxes.indexOf(<any>event.target);
+        const endBoxIndex: number = this.pitchEndBoxes.indexOf(<any>event.target);
+        const startSliderIndex: number = this._pitchStartSliders.indexOf(<any>event.target);
+        const endSliderIndex: number = this._pitchEndSliders.indexOf(<any>event.target);
+        if (startBoxIndex != -1) {
+            this._doc.record(new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[startBoxIndex].value), startBoxIndex));
+        } else if (endBoxIndex != -1) {
+            this._doc.record(new ChangeEnvelopePitchEnd(this._doc, parseInt(this.pitchEndBoxes[endBoxIndex].value), endBoxIndex));
+        } else if (startSliderIndex != -1) {
+            this._doc.record(new ChangeEnvelopePitchStart(this._doc, parseInt(this._pitchStartSliders[startSliderIndex].value), startSliderIndex));
+        } else if (endSliderIndex != -1) {
+            this._doc.record(new ChangeEnvelopePitchEnd(this._doc, parseInt(this._pitchEndSliders[endSliderIndex].value), endSliderIndex));
+        }
+    }
+
 	constructor(private _doc: SongDocument, private _extraSettingsDropdown: Function, private _openPrompt: Function) {
 		this.container.addEventListener("change", this._onChange);
 		this.container.addEventListener("click", this._onClick);
+		this.container.addEventListener("input", this._onInput);
 	}
 	
 	private _onChange = (event: Event): void => {
@@ -79,6 +106,14 @@ export class EnvelopeEditor {
 public rerenderExtraSettings() {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         for (let i = 0; i < Config.maxEnvelopeCount; i++) {
+			if (i >= instrument.envelopeCount) {
+                if (this._extraSettingsDropdowns[i]) { //make sure is not null so that we don't get an error
+                    this._extraSettingsDropdowns[i].style.display = "none";
+                }
+                if (this.extraPitchSettingsGroups[i]) {
+                    this.extraPitchSettingsGroups[i].style.display = "none";
+                }
+			}
             if (i >= instrument.envelopeCount) {
                 if (this._extraSettingsDropdowns[i]) { //make sure is not null so that we don't get an error
                     this._extraSettingsDropdowns[i].style.display = "none";
@@ -89,15 +124,50 @@ public rerenderExtraSettings() {
             } else if (this._extraSettingsDropdowns[i].textContent == "▲") {
                 this._dropdownGroups[i].style.display = "flex";
                 this._extraSettingsDropdowns[i].style.display = "inline";
+				
+				if (Config.envelopes[instrument.envelopes[i].envelope].name == "pitch") {
+                    this.extraPitchSettingsGroups[i].style.display = "flex";
+                    this.pitchStartBoxes[i].value = instrument.envelopes[i].pitchEnvelopeStart.toString();
+					this.pitchEndBoxes[i].value = instrument.envelopes[i].pitchEnvelopeEnd.toString();
+					//update note displays
+					this._startNoteDisplays[i].textContent = "Start " + this._pitchToNote(parseInt(this.pitchStartBoxes[i].value), /*instrument.isNoiseInstrument*/) + ": ";
+					this._endNoteDisplays[i].textContent = "End " + this._pitchToNote(parseInt(this.pitchEndBoxes[i].value),  /*instrument.isNoiseInstrument*/) + ": ";
+    			} else { this.extraPitchSettingsGroups[i].style.display = "none"; }
+
 				this._inverters[i].checked = instrument.envelopeInverse[i];
             } else if (this._extraSettingsDropdowns[i].textContent == "▼") {
                 this._dropdownGroups[i].style.display = "none";
                 this._extraSettingsDropdowns[i].style.display = "inline";
+				this.extraPitchSettingsGroups[i].style.display = "none";
             } else {
                 this._extraSettingsDropdowns[i].style.display = "none";
                 this._dropdownGroups[i].style.display = "none";
+				this.extraPitchSettingsGroups[i].style.display = "none";
             }
         }
+    }
+	
+	private _pitchToNote(value: number, /*isNoise: boolean*/): string {
+        let text = "";
+		/*
+        if (isNoise) {
+            value = value * 6 + 12;
+        }
+		*/
+        const offset: number = Config.keys[this._doc.song.key].basePitch % Config.pitchesPerOctave;
+        const keyValue = (value + offset) % Config.pitchesPerOctave;
+        if (Config.keys[keyValue].isWhiteKey) {
+            text = Config.keys[keyValue].name;
+        } else {
+            const shiftDir: number = Config.blackKeyNameParents[value % Config.pitchesPerOctave];
+            text = Config.keys[(keyValue + Config.pitchesPerOctave + shiftDir) % Config.pitchesPerOctave].name;
+            if (shiftDir == 1) {
+                text += "♭";
+            } else if (shiftDir == -1) {
+                text += "♯";
+            }
+        }
+        return "[" + text + Math.floor((value + Config.pitchesPerOctave) / 12 + this._doc.song.octave - 1) + "]";
     }
 
 	public render(): void {
@@ -122,12 +192,28 @@ public rerenderExtraSettings() {
 			} 
 
 
+			const startNoteSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeStart, style: "width: 113px; margin-left: 0px;", type: "range", min: "0", max: 96, step: "1" });
+            const startNoteBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeStart, style: "width: 4em; font-size: 80%; ", id: "startNoteBox", type: "number", step: "1", min: "0", max: 96 });
+            const endNoteSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeEnd, style: "width: 113px; margin-left: 0px;", type: "range", min: "0", max: 96, step: "1" });
+            const endNoteBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeEnd, style: "width: 4em; font-size: 80%; ", id: "endNoteBox", type: "number", step: "1", min: "0", max: 96 });
+			
+			const startNoteDisplay: HTMLSpanElement = HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "Start " + this._pitchToNote(parseInt(startNoteBox.value),/* instrument.isNoiseInstrument */) + ": ");
+            const endNoteDisplay: HTMLSpanElement = HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "End " + this._pitchToNote(parseInt(endNoteBox.value), /*instrument.isNoiseInstrument */) + ": ");
+            const startBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, startNoteDisplay, startNoteBox);
+            const endBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, endNoteDisplay, endNoteBox);
+
+			const startNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, startBoxWrapper, startNoteSlider);
+            const endNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, endBoxWrapper, endNoteSlider);
+
+			const extraPitchSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, startNoteWrapper, endNoteWrapper);
+            extraPitchSettingsGroup.style.display = "none";
 
 			const invertBox: HTMLInputElement = HTML.input({ "checked": instrument.envelopeInverse[envelopeIndex], type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" });
 			const invertWrapper: HTMLDivElement = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeInvert") }, "Invert: "), invertBox);
 			const extraSettingsDropdown: HTMLButtonElement = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => { const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()]; this._extraSettingsDropdown(DropdownID.EnvelopeSettings, envelopeIndex, Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name); } }, "▼");
-			const extraSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, invertWrapper);
+			const extraSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, extraPitchSettingsGroup, invertWrapper);
             extraSettingsDropdownGroup.style.display = "none";
+
 			
 
 
@@ -149,6 +235,13 @@ public rerenderExtraSettings() {
 			this._targetSelects[envelopeIndex] = targetSelect;
 			this._envelopeSelects[envelopeIndex] = envelopeSelect;
 			this._deleteButtons[envelopeIndex] = deleteButton;
+			this.extraPitchSettingsGroups[envelopeIndex] = extraPitchSettingsGroup;
+            this._pitchStartSliders[envelopeIndex] = startNoteSlider;
+            this.pitchStartBoxes[envelopeIndex] = startNoteBox;
+            this._pitchEndSliders[envelopeIndex] = endNoteSlider;
+            this.pitchEndBoxes[envelopeIndex] = endNoteBox;
+            this._startNoteDisplays[envelopeIndex] = startNoteDisplay;
+            this._endNoteDisplays[envelopeIndex] = endNoteDisplay;
 		}
 		
 		for (let envelopeIndex: number = this._renderedEnvelopeCount; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {

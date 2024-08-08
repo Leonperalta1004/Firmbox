@@ -3787,7 +3787,8 @@ export class SongEditor {
                     || document.activeElement == this._unisonOffsetInputBox
                     || document.activeElement == this._unisonExpressionInputBox
                     || document.activeElement == this._unisonSignInputBox
-
+                    || this._envelopeEditor.pitchStartBoxes.find((element) => element == document.activeElement)
+                    || this._envelopeEditor.pitchEndBoxes.find((element) => element == document.activeElement)
                 ) {
             // Enter/esc returns focus to form
             if (event.keyCode == 13 || event.keyCode == 27) {
