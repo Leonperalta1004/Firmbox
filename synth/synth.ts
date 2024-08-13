@@ -1344,13 +1344,13 @@ export class EnvelopeSettings {
         if (envelopeObject["pitchEnvelopeStart"] != undefined) {
             this.pitchEnvelopeStart = envelopeObject["pitchEnvelopeStart"]
         } else {
-            this.index = 0;
+            this.pitchEnvelopeStart = 0;
         }
 
         if (envelopeObject["pitchEnvelopeEnd"] != undefined) {
             this.pitchEnvelopeEnd = envelopeObject["pitchEnvelopeEnd"]
         } else {
-            this.index = 96;
+            this.pitchEnvelopeEnd = 96;
         }
 
 
