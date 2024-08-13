@@ -12670,13 +12670,13 @@ li.select2-results__option[role=group] > strong:hover {
                 this.pitchEnvelopeStart = envelopeObject["pitchEnvelopeStart"];
             }
             else {
-                this.index = 96;
+                this.index = 0;
             }
             if (envelopeObject["pitchEnvelopeEnd"] != undefined) {
-                this.pitchEnvelopeStart = envelopeObject["pitchEnvelopeEnd"];
+                this.pitchEnvelopeEnd = envelopeObject["pitchEnvelopeEnd"];
             }
             else {
-                this.index = 0;
+                this.index = 96;
             }
         }
     }
