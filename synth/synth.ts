@@ -7374,7 +7374,7 @@ class EnvelopeComputer {
                 if (pitch <= startNote) {
                     return 1
                 }
-                if (pitch >= startNote) {
+                if (pitch >= endNote) {
                     return 0
                 }
                 return 1 - (pitch - startNote)/range
@@ -7382,7 +7382,7 @@ class EnvelopeComputer {
                 if (pitch <= startNote) {
                     return 0
                 }
-                if (pitch >= startNote) {
+                if (pitch >= endNote) {
                     return 1
                 }
                 return (pitch - startNote)/range

@@ -280,5 +280,6 @@ public rerenderExtraSettings() {
 		this._renderedNoteFilterCount = useControlPointCount;
 		this._renderedInstrumentType = instrument.type;
 		this._renderedEffects = instrument.effects;
+		this.rerenderExtraSettings()
 	}
 }

@@ -1741,7 +1741,7 @@ export class SongEditor {
         this._customAlgorithmCanvas.redrawCanvas();
     }
 
-    private _toggleDropdownMenu(dropdown: DropdownID, submenu: number = 0): void {
+    private _toggleDropdownMenu(dropdown: DropdownID, submenu: number = 0, subtype: string | null = null): void {
         let target: HTMLButtonElement = this._vibratoDropdown;
         let group: HTMLElement = this._vibratoDropdownGroup;
         switch (dropdown) {
@@ -1796,6 +1796,15 @@ export class SongEditor {
         if (target.textContent == "▼") {
             let instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             target.textContent = "▲";
+            if (dropdown == DropdownID.EnvelopeSettings) {
+                group.style.display = "flex";
+                if (subtype == "pitch") { 
+                    this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "flex";
+                } else {
+                    this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
+                }
+                this._envelopeEditor.rerenderExtraSettings();
+            } else 
             if (group != this._chordDropdownGroup) {
                 group.style.display = "";
             } // Only show arpeggio dropdown if chord arpeggiates
