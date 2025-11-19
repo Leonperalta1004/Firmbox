@@ -39,16 +39,6 @@ export class EditorConfig {
         // The order of this array needs to line up with the order of the InstrumentType declarations in SynthConfig.ts. (changes.ts' random instrument generation relies on this, for one.)
             name: "Custom Instruments", presets: <DictionaryArray<Preset>>toNameMap([
                 { name: TypePresets[InstrumentType.chip], customType: InstrumentType.chip },
-                { name: TypePresets[InstrumentType.fm], customType: InstrumentType.fm },
-                { name: TypePresets[InstrumentType.noise], customType: InstrumentType.noise },
-                { name: TypePresets[InstrumentType.spectrum], customType: InstrumentType.spectrum },
-                { name: TypePresets[InstrumentType.drumset], customType: InstrumentType.drumset },
-                { name: TypePresets[InstrumentType.harmonics], customType: InstrumentType.harmonics },
-                { name: TypePresets[InstrumentType.pwm], customType: InstrumentType.pwm },
-                { name: TypePresets[InstrumentType.pickedString], customType: InstrumentType.pickedString },
-                { name: TypePresets[InstrumentType.supersaw], customType: InstrumentType.supersaw },
-                { name: TypePresets[InstrumentType.customChipWave], customType: InstrumentType.customChipWave },
-                { name: TypePresets[InstrumentType.fm6op], customType: InstrumentType.fm6op },
             ])
         },
         {
